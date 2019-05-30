@@ -228,7 +228,8 @@ proc = subprocess.run(
 # To print the output of the command without byte literals
 print(proc.stdout.decode())
 
-
+# check=True allows for stderr printing
+new_proc = subprocess.run(['cat', 'fake.txt'], check=True)
 
 
 
