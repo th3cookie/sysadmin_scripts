@@ -12,11 +12,11 @@ with open('/usr/share/dict/words') as f:
     words = f.readlines()
 
 # matches = []
-
 # for word in words:
 #     if snippet in word.lower():
 #         matches.append(word)
 
+# Above is standard way, below is one liner
 matches = [word.strip() for word in words if snippet in word.lower()]
 
 print(matches)
