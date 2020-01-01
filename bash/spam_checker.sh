@@ -1,5 +1,6 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
+# MSGID="1imlXm-0024QK-4l"
 MSGID="$1";
 if [[ -z $MSGID ]]; then
     INVESTIGATE=$(exim -bp | awk -F '<' '/^ *[0-9]+/{print $2}' | cut -d '>' -f1 | sort | uniq -c | sort -n | grep -v $(facter fqdn) | tail -n 1 | awk '{print $2}')
@@ -23,16 +24,16 @@ DOVERETURN=$(echo "${MSG}" | awk -v dove="$DOVEMETHOD" -F $DOVEMETHOD: '/dove/ {
 SUBJECT=$(echo "${MSG}" | grep "T=" | head -n 1 | grep -oP "T=\".*\"" | cut -d '"' -f 2);
 MSGIP=$(echo "${MSG}" | grep "H=" | head -n 1 | grep -oP "(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))" | tail -n 1)
 RETMSGIP=$?
+DOMAIN=$(echo ${DOVERETURN} | awk -F '@' '{print $2}');
 USRNAME=$(echo "${MSG}" | grep 'U=' | awk -F 'U=' '{print $2}' | grep -v mailnull | awk '{print $1}' | head -n 1);
 if [[ -z "${USRNAME}" ]]; then
     USRNAME=$(echo "${MSG}" | grep "SpamAssassin as" | awk -F 'SpamAssassin as' '{print $2}' | awk '{print $1}' | head -n 1)
 fi
-if [[ -z "${USRNAME}" ]]; then
-    USRNAME=$(grep "${DOMAIN}" /etc/trueuserdomains | awk -F ':' '{print substr($2,2)}')
-fi
-DOMAIN=$(echo ${DOVERETURN} | awk -F '@' '{print $2}');
-if [[ -z "${DOMAIN}" ]]; then
+if [[ -z "${DOMAIN}" ]] && [[ -n "${USRNAME}" ]]; then
     DOMAIN=$(grep ${USRNAME} /etc/trueuserdomains | awk -F: '{print $1}')
+fi
+if [[ -z "${USRNAME}" ]] && [[ -n "${DOMAIN}" ]]; then
+    USRNAME=$(grep "${DOMAIN}" /etc/trueuserdomains | awk -F ':' '{print substr($2,2)}')
 fi
 echo -e "\nFull Logs:\n\n-------------------------------------------------------------------------------\n\nDid this return the right logs? (note it could be a bounceback)\n\n${MSG}\n\n-------------------------------------------------------------------------------\n"
 echo -e "Cpanel username of the originating email is:\t${USRNAME}";
