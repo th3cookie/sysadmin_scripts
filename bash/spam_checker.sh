@@ -62,6 +62,7 @@ else
             cat << EOF
 Put this in the htaccess:
 
+# Joomla contact form blocked by <COMPANY> due to email abuse - 02/01/2020
 RewriteCond %{QUERY_STRING} !^/?option=
 RewriteRule .? - [S=2]
 RewriteCond %{QUERY_STRING} !/?option=([a-z0-9_]+)&view=.* [NC]
