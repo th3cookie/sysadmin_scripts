@@ -38,13 +38,13 @@ fi
 echo -e "\nFull Logs:\n\n-------------------------------------------------------------------------------\n\nDid this return the right logs? (note it could be a bounceback)\n\n${MSG}\n\n-------------------------------------------------------------------------------\n"
 echo -e "Cpanel username of the originating email is:\t${USRNAME}";
 echo -e "Domain for this account is: \t\t\t${DOMAIN}";
+echo -e "The Subject of the email was:\t${SUBJECT}\n"
 if [[ ${RETMSGIP} -eq 0 ]]; then
     echo -e "Connecting IP sending to exim:\t\t\t${MSGIP}"
     echo -e "Geoiplookup of this IP:\t\t\t\t$(geoiplookup ${MSGIP})\n"
 fi
 if [[ -n ${DOVEMETHOD} ]]; then
     echo -e "Appears to be dovecot, the sending email is: ${DOVERETURN}"
-    echo -e "The Subject of the email was:\t${SUBJECT}\n"
     echo "Use this command to roll the password (only if you know it's compromised):"
     echo -e "/usr/local/cpanel/bin/uapi --user=${USRNAME} Email passwd_pop email=$(echo ${DOVERETURN} | awk -F '@' '{print $1}') password=$(openssl rand -base64 15) domain=$(echo ${DOVERETURN} | awk -F '@' '{print $2}')\n"
     echo -e "Send this to au-servicedesk-alerts:\nCan someone please get in touch with '"${USRNAME}"' on '$(facter fqdn)'\nCompromised email password has been rolled -> ${DOVERETURN}\n"
