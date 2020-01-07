@@ -38,7 +38,7 @@ fi
 echo -e "\nFull Logs:\n\n-------------------------------------------------------------------------------\n\nDid this return the right logs? (note it could be a bounceback)\n\n${MSG}\n\n-------------------------------------------------------------------------------\n"
 echo -e "Cpanel username of the originating email is:\t${USRNAME}";
 echo -e "Domain for this account is: \t\t\t${DOMAIN}";
-echo -e "The Subject of the email was:\t${SUBJECT}\n"
+echo -e "The Subject of the email was:\t\t\t${SUBJECT}\n"
 if [[ ${RETMSGIP} -eq 0 ]]; then
     echo -e "Connecting IP sending to exim:\t\t\t${MSGIP}"
     echo -e "Geoiplookup of this IP:\t\t\t\t$(geoiplookup ${MSGIP})\n"
