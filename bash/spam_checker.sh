@@ -51,7 +51,10 @@ if [[ -n ${DOVEMETHOD} ]]; then
 else
     echo -e "It's not dovecot, Checking for compromised scripts...\n"
     SCRIPTSITES=$(grep cwd /var/log/exim_mainlog | grep -v /var/spool | awk -F"cwd=" '{print $2}' | grep -vP ^$ | awk '{print $1}' | sort | uniq -c | sort -n | grep -v '\/tmp\/\|\/usr\/local\|\/etc\/csf\|\/root\|\/$' | tail)
-    echo -e "${SCRIPTSITES}"
+    echo -e "${SCRIPTSITES}\n"
+    echo -e "Checking Username ${USRNAME} for the most POST requests in apache logs.\nPlease investigate the below manually...\n"
+    echo -e "$(grep POST /home/${USRNAME}/access-logs/* | awk '{print $7}' | sort -n | uniq -c | sort -n)\n"
+    # Doing Joomla Checks
     echo "${SCRIPTSITES}" | while read line; do
         HOMEDIR=$(echo "${line}" | awk -F '/' '{print $3}' | grep -v ^$)
         COMCONTACT=$(grep POST /home/${HOMEDIR}/access-logs/* 2> /dev/null | grep 'com_contact' | awk '{print $7}' | sort -n | uniq -c | sort -n)
