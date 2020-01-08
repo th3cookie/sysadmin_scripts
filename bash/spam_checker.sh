@@ -41,7 +41,7 @@ echo -e "Domain for this account is: \t\t\t${DOMAIN}";
 echo -e "The Subject of the email was:\t\t\t${SUBJECT}\n"
 if [[ ${RETMSGIP} -eq 0 ]]; then
     echo -e "Connecting IP sending to exim:\t\t\t${MSGIP}"
-    echo -e "Geoiplookup of this IP:\t\t\t\t$(geoiplookup ${MSGIP})\n"
+    echo -e "Geoiplookup of this IP:\t\t\t\t$(geoiplookup ${MSGIP} | head -n 1)\n"
 fi
 if [[ -n ${DOVEMETHOD} ]]; then
     echo -e "Appears to be dovecot, the sending email is: ${DOVERETURN}"
