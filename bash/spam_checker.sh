@@ -39,7 +39,7 @@ if [[ ${USRNAME} =~ __cpanel__service__auth.* ]]; then
     DOMAIN=$(echo "${MSG}" | grep -oP '(cpanel@(\w*\.*)*)' | head -n 1 | awk -F '@' '{print $2}')
     USRNAME=$(grep "${DOMAIN}" /etc/trueuserdomains | awk -F ':' '{print substr($2,2)}')
 fi
-echo -e "\nFull Logs:\n\n-------------------------------------------------------------------------------\n\nDid this return the right logs? (note it could be a bounceback)\n\n${MSG}\n\n-------------------------------------------------------------------------------\n"
+echo -e "\nFull Logs for Message ID '${MSGID}':\n\n-------------------------------------------------------------------------------\n\nDid this return the right logs? (note it could be a bounceback)\n\n${MSG}\n\n-------------------------------------------------------------------------------\n"
 echo -e "Cpanel username of the originating email is:\t${USRNAME}";
 echo -e "Domain for this account is: \t\t\t${DOMAIN}";
 echo -e "The Subject of the email was:\t\t\t${SUBJECT}\n"
