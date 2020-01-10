@@ -19,13 +19,13 @@ else
         MSG=$(zgrep ${MSGID} /var/log/exim_mainlog*)
     fi
 fi
-DOVEMETHOD=$(echo "${MSG}" | grep -oP 'dovecot_(plain|login)');
-DOVERETURN=$(echo "${MSG}" | awk -v dove="$DOVEMETHOD" -F $DOVEMETHOD: '/dove/ {print $2}' | awk '{print $1}');
-SUBJECT=$(echo "${MSG}" | grep "T=" | head -n 1 | grep -oP "T=\".*\"" | cut -d '"' -f 2);
+DOVEMETHOD=$(echo "${MSG}" | grep -oP 'dovecot_(plain|login)')
+DOVERETURN=$(echo "${MSG}" | awk -v dove="$DOVEMETHOD" -F $DOVEMETHOD: '/dove/ {print $2}' | awk '{print $1}')
+SUBJECT=$(echo "${MSG}" | grep "T=" | head -n 1 | grep -oP "T=\".*\"" | cut -d '"' -f 2)
 MSGIP=$(echo "${MSG}" | grep "H=" | head -n 1 | grep -oP "(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))" | tail -n 1)
 RETMSGIP=$?
-DOMAIN=$(echo ${DOVERETURN} | awk -F '@' '{print $2}');
-USRNAME=$(echo "${MSG}" | grep 'U=' | awk -F 'U=' '{print $2}' | grep -v mailnull | awk '{print $1}' | head -n 1);
+DOMAIN=$(echo ${DOVERETURN} | awk -F '@' '{print $2}')
+USRNAME=$(echo "${MSG}" | grep 'U=' | awk -F 'U=' '{print $2}' | grep -v mailnull | awk '{print $1}' | head -n 1)
 if [[ -z "${USRNAME}" ]]; then
     USRNAME=$(echo "${MSG}" | grep "SpamAssassin as" | awk -F 'SpamAssassin as' '{print $2}' | awk '{print $1}' | head -n 1)
 fi
@@ -33,6 +33,10 @@ if [[ -z "${DOMAIN}" ]] && [[ -n "${USRNAME}" ]]; then
     DOMAIN=$(grep ${USRNAME} /etc/trueuserdomains | awk -F: '{print $1}')
 fi
 if [[ -z "${USRNAME}" ]] && [[ -n "${DOMAIN}" ]]; then
+    USRNAME=$(grep "${DOMAIN}" /etc/trueuserdomains | awk -F ':' '{print substr($2,2)}')
+fi
+if [[ ${USRNAME} =~ __cpanel__service__auth.* ]]; then
+    DOMAIN=$(echo "${MSG}" | grep -oP '(cpanel@(\w*\.*)*)' | head -n 1 | awk -F '@' '{print $2}')
     USRNAME=$(grep "${DOMAIN}" /etc/trueuserdomains | awk -F ':' '{print substr($2,2)}')
 fi
 echo -e "\nFull Logs:\n\n-------------------------------------------------------------------------------\n\nDid this return the right logs? (note it could be a bounceback)\n\n${MSG}\n\n-------------------------------------------------------------------------------\n"
@@ -44,10 +48,16 @@ if [[ ${RETMSGIP} -eq 0 ]]; then
     echo -e "Geoiplookup of this IP:\t\t\t\t$(geoiplookup ${MSGIP} | head -n 1)\n"
 fi
 if [[ -n ${DOVEMETHOD} ]]; then
-    echo -e "Appears to be dovecot, the sending email is: ${DOVERETURN}"
-    echo "Use this command to roll the password (only if you know it's compromised):"
-    echo -e "/usr/local/cpanel/bin/uapi --user=${USRNAME} Email passwd_pop email=$(echo ${DOVERETURN} | awk -F '@' '{print $1}') password=$(openssl rand -base64 15) domain=$(echo ${DOVERETURN} | awk -F '@' '{print $2}')\n"
-    echo -e "Send this to au-servicedesk-alerts:\nCan someone please get in touch with '"${USRNAME}"' on '$(facter fqdn)'\nCompromised email password has been rolled -> ${DOVERETURN}\nReseller Owner account name is '$(grep OWNER /var/cpanel/users/${USRNAME} | awk -F= '{print $2}')'\n"
+    if [[ $(echo "${SUBJECT}" | grep -q "SSL Pending Queue") -eq 0 ]]; then
+        echo -e "Appears to be broken SSL queue for username ${USRNAME}. Use this commands to roll the SSL and clear exim for this user:"
+        echo -e "mv -v /home/${USRNAME}/.cpanel/ssl/pending_queue.json{,.old}"
+        echo -e "exim -bp | grep -B 1 ${DOMAIN} | grep \< | awk '{print \$3}' | xargs exim -Mrm\n"
+    else
+        echo -e "Appears to be dovecot, the sending email is: ${DOVERETURN}"
+        echo "Use this command to roll the password (only if you know it's compromised):"
+        echo -e "/usr/local/cpanel/bin/uapi --user=${USRNAME} Email passwd_pop email=$(echo ${DOVERETURN} | awk -F '@' '{print $1}') password=$(openssl rand -base64 15) domain=$(echo ${DOVERETURN} | awk -F '@' '{print $2}')\n"
+        echo -e "Send this to au-servicedesk-alerts:\nCan someone please get in touch with '"${USRNAME}"' on '$(facter fqdn)'\nCompromised email password has been rolled -> ${DOVERETURN}\nReseller Owner account name is '$(grep OWNER /var/cpanel/users/${USRNAME} | awk -F= '{print $2}')'\n"
+    fi
 else
     echo -e "It's not dovecot, Checking for compromised scripts...\n"
     SCRIPTSITES=$(grep cwd /var/log/exim_mainlog | grep -v /var/spool | awk -F"cwd=" '{print $2}' | grep -vP ^$ | awk '{print $1}' | sort | uniq -c | sort -n | grep -v '\/tmp\/\|\/usr\/local\|\/etc\/csf\|\/root\|\/$' | tail)
