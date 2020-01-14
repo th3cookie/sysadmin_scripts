@@ -48,7 +48,7 @@ if [[ ${RETMSGIP} -eq 0 ]]; then
     echo -e "Geoiplookup of this IP:\t\t\t\t$(geoiplookup ${MSGIP} | head -n 1)\n"
 fi
 if [[ -n ${DOVEMETHOD} ]]; then
-    if [[ $(echo "${SUBJECT}" | grep -q "SSL Pending Queue") ]]; then
+    if [[ $(echo "${SUBJECT}" | grep -q "SSL Pending Queue") -eq 0 ]]; then
         echo -e "Appears to be broken SSL queue for username ${USRNAME}. Use this commands to roll the SSL and clear exim for this user:"
         echo -e "mv -v /home/${USRNAME}/.cpanel/ssl/pending_queue.json{,.old}"
         echo -e "exim -bp | grep -B 1 ${DOMAIN} | grep \< | awk '{print \$3}' | xargs exim -Mrm\n"
