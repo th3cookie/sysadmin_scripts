@@ -138,7 +138,15 @@ if [[ $INSTALL_METHOD =~ (dnf|yum) ]]; then
     sudo firewall-cmd --add-service=mysql --permanent
     sudo firewall-cmd --reload
 elif [[ $INSTALL_METHOD =~ apt ]]; then
-    echo "blah"
+    sudo tasksel install lamp-server
+    if [[ $? -ge 1 ]]; then
+        sudo $INSTALL_COMMAND -y install mysql-server mysql-client libmysqlclient-dev apache2 apache2-doc apache2-npm-prefork apache2-utils libexpat1 ssl-cert \
+        libapache2-mod-php7.0 php7.0 php7.0-common php7.0-curl php7.0-dev php7.0-gd php-pear php-imagick php7.0-mcrypt php7.0-mysql php7.0-ps php7.0-xsl phpmyadmin
+    fi
+    sudo ufw allow in "Apache Full"
+    sudo a2dismod mpm_event
+    sudo a2enmod mpm_prefork
+    sudo systemctl restart apache2
 else
     echo "Cannot install Lamp Stack on machine. This is due to unknown package manager or OS."
 fi
