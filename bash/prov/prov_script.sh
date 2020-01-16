@@ -7,6 +7,7 @@ sudo echo "Thank you. Continuing..."
 # If no sudo - quit
 if [[ $? -eq 1 ]]
 then
+    echo "Incorrect sudo password, cannot continue. Exiting..."
     exit 1
 fi
 
