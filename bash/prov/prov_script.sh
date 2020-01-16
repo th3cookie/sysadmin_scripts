@@ -152,7 +152,19 @@ if [[ $INSTALL_METHOD =~ (dnf|yum) ]]; then
     sudo mkdir /var/lib/mysql/mysql
     sudo chown -R mysql:mysql /var/lib/mysql
     sudo mysql_install_db
-    sudo mysql_secure_installation
+    # In lieu of using mysql_secure_installation, this will require no prompt from user
+    rootpass=$(date +%s | sha256sum | base64 | head -c 12 ; echo)
+    echo "[client]" > ~/.my.cnf
+    echo "user=root" >> ~/.my.cnf
+    echo "password=${rootpass}" >> ~/.my.cnf
+    echo "Mysql root password stored in ~/.my.cnf"
+    mysql -u root <<-EOF
+UPDATE mysql.user SET Password=PASSWORD('$rootpass') WHERE User='root';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
+FLUSH PRIVILEGES;
+EOF
 elif [[ $INSTALL_METHOD =~ apt ]]; then
     sudo tasksel install lamp-server
     if [[ $? -ge 1 ]]; then
