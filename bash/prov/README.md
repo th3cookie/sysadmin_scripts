@@ -13,7 +13,7 @@ Make sure the 'configs' folder is in the same directory as the prov script. It w
 Download and run the prov script:
 
 ```
-wget -O prov.sh https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/prov/prov_script.sh
+wget -O ~/prov.sh https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/prov/prov_script.sh
 chmod +x prov.sh
 ./prov.sh
 ```
