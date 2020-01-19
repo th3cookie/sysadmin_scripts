@@ -9,6 +9,7 @@ fi
 BOUNCE=$(exim -bp | grep "${MSGID}");
 echo "${BOUNCE}" | grep -q '<>'
 if [[ $? -eq 0 ]]; then
+    echo "This message was a bounceback. Tracing it back to it's source..."
     MSG=$(grep ${MSGID} /var/log/exim_mainlog | awk '/<>/{print substr($6,3)}' | xargs -I {} zgrep {} /var/log/exim_mainlog)
     if [[ -z ${MSG} ]]; then
         MSG=$(zgrep ${MSGID} /var/log/exim_mainlog* | awk '/<>/{print substr($6,3)}' | xargs -I {} zgrep {} /var/log/exim_mainlog*)
