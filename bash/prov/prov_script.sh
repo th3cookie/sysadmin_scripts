@@ -1,8 +1,5 @@
 #!/bin/bash
 # Things to check before running:
-# Xampp link - Search "XAMPP_LINK"
-
-GIT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 echo "Please enter your sudo password..."
 sudo echo "Thank you. Continuing..."
@@ -10,8 +7,17 @@ sudo echo "Thank you. Continuing..."
 # If no sudo - quit
 if [[ $? -eq 1 ]]
 then
+    echo "Incorrect sudo password, cannot continue. Exiting..."
     exit 1
 fi
+
+# Creating dir structure and properties
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+GIT_DIR=~/git
+sudo mkdir $GIT_DIR
+chown -R $USER:$USER $GIT_DIR
+chmod 755 $GIT_DIR
+mkdir -p ~/work /mnt/NAS/Samis_folder
 
 if [[ -x $(command -v apt) ]]; then
     INSTALL_COMMAND=$(command -v apt)
@@ -45,9 +51,6 @@ fi
 EOF >> ~/.bashrc
     touch ~/.bash_aliases
 fi
-
-# Creating dir structure
-mkdir -p ~/git ~/work /mnt/NAS/Samis_folder
 
 # Installing required packages
 $INSTALL_COMMAND update
@@ -115,28 +118,53 @@ if [[ $INSTALL_METHOD =~ (dnf|yum) ]]; then
     sudo $INSTALL_COMMAND -y install httpd php php-cli php-php-gettext php-mbstring php-mcrypt php-mysqlnd php-pear php-curl php-gd php-xml php-bcmath php-zip mariadb-server
 
     # Configure Apache
+    echo "Installing and configuring Apache..."
     sudo mv /etc/httpd/conf/httpd.conf{,.old}
-    sudo cp $GIT_DIR/configs/httpd.conf /etc/httpd/conf/httpd.conf
+    sudo cp $SCRIPT_DIR/configs/httpd.conf /etc/httpd/conf/httpd.conf
+    sudo mv /etc/httpd/conf.d/userdir.conf{,.old}
+    sudo cp $SCRIPT_DIR/configs/userdir.conf /etc/httpd/conf.d/userdir.conf
+    chmod 711 ~
     sudo systemctl start httpd
     sudo systemctl enable httpd
     sudo firewall-cmd --add-service={http,https} --permanent
     sudo firewall-cmd --reload
+    echo "You can find your website at 'http://localhost/~${USER}'."
+    echo "You can pull your git repo's in here to work on them locally."
 
     # Do PHP
+    echo "Installing and configuring PHP..."
     sudo mv /etc/php.ini{,.old}
-    sudo cp $GIT_DIR/configs/php.ini /etc/php.ini
-    sudo cp $GIT_DIR/configs/info.php /var/www/html/
+    sudo cp $SCRIPT_DIR/configs/php.ini /etc/php.ini
+    sudo cp $SCRIPT_DIR/configs/info.php ~/git/
     sudo systemctl reload httpd
 
     # Do MariaDB
-    ### THIS ONE NEEDS WORK, I CAN'T GET MARIADB WORKING ON FEDORA 31... ###
+    echo "Installing and configuring MariaDB..."
     sudo mv /etc/my.cnf.d/mariadb-server.cnf{,.old}
-    sudo cp $GIT_DIR/configs/mariadb-server.cnf /etc/my.cnf.d/mariadb-server.cnf
+    sudo cp $SCRIPT_DIR/configs/mariadb-server.cnf /etc/my.cnf.d/mariadb-server.cnf
     mysql_secure_installation
     sudo systemctl start mariadb
     sudo systemctl enable mariadb
     sudo firewall-cmd --add-service=mysql --permanent
     sudo firewall-cmd --reload
+    sudo rm -rf /var/lib/mysql
+    sudo mkdir /var/lib/mysql
+    sudo mkdir /var/lib/mysql/mysql
+    sudo chown -R mysql:mysql /var/lib/mysql
+    sudo mysql_install_db
+    # In lieu of using mysql_secure_installation, this will require no prompt from user
+    rootpass=$(date +%s | sha256sum | base64 | head -c 12 ; echo)
+    echo "[client]" > ~/.my.cnf
+    echo "user=root" >> ~/.my.cnf
+    echo "password=${rootpass}" >> ~/.my.cnf
+    echo "Mysql root password stored in ~/.my.cnf"
+    mysql -u root <<-EOF
+UPDATE mysql.user SET Password=PASSWORD('$rootpass') WHERE User='root';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
+FLUSH PRIVILEGES;
+EOF
 elif [[ $INSTALL_METHOD =~ apt ]]; then
     sudo tasksel install lamp-server
     if [[ $? -ge 1 ]]; then
@@ -144,8 +172,7 @@ elif [[ $INSTALL_METHOD =~ apt ]]; then
         libapache2-mod-php7.0 php7.0 php7.0-common php7.0-curl php7.0-dev php7.0-gd php-pear php-imagick php7.0-mcrypt php7.0-mysql php7.0-ps php7.0-xsl phpmyadmin
     fi
     sudo ufw allow in "Apache Full"
-    sudo a2dismod mpm_event
-    sudo a2enmod mpm_prefork
+    sudo a2enmod mpm_event
     sudo systemctl restart apache2
 else
     echo "Cannot install Lamp Stack on machine. This is due to unknown package manager or OS."
@@ -162,7 +189,7 @@ ssh-add ~/.ssh/SShakir-openssh-private-key &> /dev/null
 
 # Change Password and you also need to install samba if this fails - sudo dnf install samba
 EOF >> ~/.bashrc
-echo -e "sudo mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1.0 //10.0.0.3/Samis_Folder /mnt/NAS/Samis_folder/" >> ~/.bashrc
+echo -e "#sudo mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1.0 //10.0.0.3/Samis_Folder /mnt/NAS/Samis_folder/" >> ~/.bashrc
 
 #####################
 ### .bash_aliases ###
@@ -174,8 +201,6 @@ alias apt='sudo apt'
 alias yum='sudo yum'
 alias hosts='sudo vim /etc/hosts'
 alias ssh='ssh -oStrictHostKeyChecking=no'
-alias xstart='sudo /opt/lampp/lampp start'
-alias xstop='sudo /opt/lampp/lampp stop'
 alias crucial='ssh root@182.160.155.217'
 alias dpded='ssh ded.somethinglikesami.net -p 7022'
 alias reslack='pkill slack && slack'
@@ -185,29 +210,10 @@ alias traceroute='sudo traceroute -I'
 alias fireth3cookie='(firefox -P th3cookie &> /dev/null &disown)'
 alias firework='(firefox -P Work &> /dev/null &disown)'
 alias ovpn='sudo openvpn --config ~/work/hostopia.ovpn &'
-alias xampp='sudo /opt/lampp/lampp'
 EOF >> ~/.bash_aliases
 
 ##############
 ### Others ###
 ##############
 
-# Deprecated Xampp install - Going LAMP instead - Like a pro sysadmin should..
-# cd ~/Downloads/
-# XAMPP_LINK="https://www.apachefriends.org/xampp-files/7.4.1/xampp-linux-x64-7.4.1-0-installer.run"
-# XAMPP_RET=$?
-# XAMPP_FILE=$(echo "${XAMPP_LINK}" | awk -F "/" '{print $NF}')
-# echo "Downloading '${XAMPP_FILE}'"
-# wget $XAMPP_LINK
-# if [[ $? -ge 1 ]]; then
-#     echo "Could not download Xampp using the following wget command:"
-#     echo "${XAMPP_LINK}"
-#     echo "Please check the link and install it manually. Skipping it..."
-# else
-#     echo "Installing '${XAMPP_FILE}'"
-#     chmod +x $XAMPP_FILE
-#     sudo ./$XAMPP_FILE &disown
-#     echo "Please finish the Xampp installation using the GUI installer."
-#     # Xampp fix for fedora/RHEL machines to get apache working
-#     sudo ln -s /lib64/libnsl.so.2 /lib64/libnsl.so.1
-# fi
+sudo cp $SCRIPT_DIR/configs/.vimrc ~/
