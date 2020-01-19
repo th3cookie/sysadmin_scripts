@@ -1,7 +1,7 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
 # MSGID="1imlXm-0024QK-4l"
-MSGID="$1";
+MSGID="1itIty-003sE9-UG";
 if [[ -z $MSGID ]]; then
     INVESTIGATE=$(exim -bp | awk -F '<' '/^ *[0-9]+/{print $2}' | cut -d '>' -f1 | sort | uniq -c | sort -n | grep -v $(facter fqdn) | tail -n 1 | awk '{print $2}')
     MSGID=$(exim -bp | grep -B 1 ${INVESTIGATE} | grep \< | awk '{print $3}' | tail -n 1)
@@ -49,7 +49,7 @@ if [[ ${RETMSGIP} -eq 0 ]]; then
     echo -e "Geoiplookup of this IP:\t\t\t\t$(geoiplookup ${MSGIP} | head -n 1)\n"
 fi
 if [[ -n ${DOVEMETHOD} ]]; then
-    if [[ $(echo "${SUBJECT}" | grep -q "SSL Pending Queue") -eq 0 ]]; then
+    if [[ $SUBJECT =~ "SSL Pending Queue" ]]; then
         echo -e "Appears to be broken SSL queue for username ${USRNAME}. Use this commands to roll the SSL and clear exim for this user:"
         echo -e "mv -v /home/${USRNAME}/.cpanel/ssl/pending_queue.json{,.old}"
         echo -e "exim -bp | grep -B 1 ${DOMAIN} | grep \< | awk '{print \$3}' | xargs exim -Mrm\n"
