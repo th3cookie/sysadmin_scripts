@@ -1,7 +1,7 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
 # MSGID="1imlXm-0024QK-4l"
-MSGID="1itIty-003sE9-UG";
+MSGID="$1";
 if [[ -z $MSGID ]]; then
     INVESTIGATE=$(exim -bp | awk -F '<' '/^ *[0-9]+/{print $2}' | cut -d '>' -f1 | sort | uniq -c | sort -n | grep -v $(facter fqdn) | tail -n 1 | awk '{print $2}')
     MSGID=$(exim -bp | grep -B 1 ${INVESTIGATE} | grep \< | awk '{print $3}' | tail -n 1)
