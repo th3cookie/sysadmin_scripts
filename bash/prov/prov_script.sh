@@ -115,7 +115,7 @@ fi
 
 if [[ $INSTALL_METHOD =~ (dnf|yum) ]]; then
     # Do installs
-    sudo $INSTALL_COMMAND -y install httpd php php-cli php-php-gettext php-mbstring php-mcrypt php-mysqlnd php-pear php-curl php-gd php-xml php-bcmath php-zip mariadb-server
+    sudo $INSTALL_COMMAND -y install httpd php php-devel php-cli php-php-gettext php-mbstring php-mcrypt php-mysqlnd php-pear php-curl php-gd php-xml php-bcmath php-zip mariadb-server
 
     # Configure Apache
     echo "Installing and configuring Apache..."
@@ -137,6 +137,7 @@ if [[ $INSTALL_METHOD =~ (dnf|yum) ]]; then
     sudo cp $SCRIPT_DIR/configs/php.ini /etc/php.ini
     sudo cp $SCRIPT_DIR/configs/info.php ~/git/
     sudo systemctl reload httpd
+    sudo pecl install xdebug
 
     # Do MariaDB
     echo "Installing and configuring MariaDB..."
