@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
-# MSGID="1imlXm-0024QK-4l"
+# Usage -> MSGID="1itZD5-008Ars-RY"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh) $MSGID
 MSGID="$1";
 if [[ -z $MSGID ]]; then
     INVESTIGATE=$(exim -bp | awk -F '<' '/^ *[0-9]+/{print $2}' | cut -d '>' -f1 | sort | uniq -c | sort -n | grep -v $(facter fqdn) | tail -n 1 | awk '{print $2}')
