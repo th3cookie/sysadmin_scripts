@@ -1,5 +1,5 @@
 #!/bin/bash
-# Usage -> wget -O - https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/web_attacks.sh | bash
+# Usage -> bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/web_attacks.sh)
 
 LOGS=$(grep -P '(wp-login|xmlrpc|contact).*\"\ 200\ ' /usr/local/apache/domlogs/*/* | grep POST | grep $(date +%Y:%H) | cut -d " " -f 1 | cut -d ':' -f 2 | sort | uniq -c | sort -n | tail -n 20)
 echo "${LOGS}" | while read i; do
