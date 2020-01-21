@@ -1,6 +1,8 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
 # Usage -> MSGID="1itZD5-008Ars-RY"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh) $MSGID
+# Usage 2 -> MSGID="1itJK6-004Keg-O7"; wget https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh -O ~/chk_spam.sh && chmod +x ~/chk_spam.sh; ~/chk_spam.sh $MSGID
+
 MSGID="$1";
 if [[ -z $MSGID ]]; then
     INVESTIGATE=$(exim -bp | awk -F '<' '/^ *[0-9]+/{print $2}' | cut -d '>' -f1 | sort | uniq -c | sort -n | grep -v $(facter fqdn) | tail -n 1 | awk '{print $2}')
@@ -90,3 +92,6 @@ EOF
     # echo -e "sample of script sending logs from the IP:\n$(grep ${MSGIP} /home/${USRNAME}/access-logs/* 2> /dev/null | tail)\n"
     echo -e "\nSend this to au-servicedesk-alerts:\n\nCan someone get in touch with '"${USRNAME}"' on '$(facter fqdn)'\nCompromised form on website '${DOMAIN}' is sending spam - blocked in htaccess\nReseller Owner account name is '$(grep OWNER /var/cpanel/users/${USRNAME} | awk -F= '{print $2}')'\n"
 fi
+
+echo -e "\nClear the exim queue with (substitute <> with search term if email address needed):"
+echo "exim -bp | awk '/<>/{print \$3}' | xargs exim -Mrm"
