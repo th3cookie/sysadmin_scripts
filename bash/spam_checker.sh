@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
-# Usage -> MSGID="1itZD5-008Ars-RY"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh) $MSGID
+# Usage -> MSGID="1itkoW-003Lav-J9"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh) $MSGID
 # Usage 2 -> MSGID="1itJK6-004Keg-O7"; wget https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh -O ~/chk_spam.sh && chmod +x ~/chk_spam.sh; ~/chk_spam.sh $MSGID
 
 MSGID="$1";
@@ -42,6 +42,7 @@ if [[ ${USRNAME} =~ __cpanel__service__auth.* ]]; then
     DOMAIN=$(echo "${MSG}" | grep -oP '(cpanel@(\w*\.*)*)' | head -n 1 | awk -F '@' '{print $2}')
     USRNAME=$(grep "${DOMAIN}" /etc/trueuserdomains | awk -F ':' '{print substr($2,2)}')
 fi
+RESELLER=$(grep OWNER /var/cpanel/users/${USRNAME} | awk -F= '{print $2}')
 echo -e "\nFull Logs for Message ID '${MSGID}':\n\n-------------------------------------------------------------------------------\n\nDid this return the right logs? (note it could be a bounceback)\n\n${MSG}\n\n-------------------------------------------------------------------------------\n"
 echo -e "Cpanel username of the originating email is:\t${USRNAME}";
 echo -e "Domain for this account is: \t\t\t${DOMAIN}";
@@ -59,7 +60,12 @@ if [[ -n ${DOVEMETHOD} ]]; then
         echo -e "Appears to be dovecot, the sending email is: ${DOVERETURN}"
         echo "Use this command to roll the password (only if you know it's compromised):"
         echo -e "/usr/local/cpanel/bin/uapi --user=${USRNAME} Email passwd_pop email=$(echo ${DOVERETURN} | awk -F '@' '{print $1}') password=$(openssl rand -base64 15) domain=$(echo ${DOVERETURN} | awk -F '@' '{print $2}')\n"
-        echo -e "Send this to au-servicedesk-alerts:\nCan someone please get in touch with '"${USRNAME}"' on '$(facter fqdn)'\nCompromised email password has been rolled -> ${DOVERETURN}\nReseller Owner account name is '$(grep OWNER /var/cpanel/users/${USRNAME} | awk -F= '{print $2}')'\n"
+        echo "Send this to au-servicedesk-alerts:"
+        echo "Can someone please get in touch with '"${USRNAME}"' on '$(hostname)'"
+        echo "Compromised email password has been rolled -> ${DOVERETURN}"
+        if [[ ! $RESELLER =~ (dpresell|shared) ]]; then
+            echo "Reseller Owner account name is '${RESELLER}'\n--------------------------------------------------"
+        fi
     fi
 else
     echo -e "It's not dovecot, Checking for compromised scripts...\n"
@@ -74,11 +80,10 @@ else
         if [[ -n ${COMCONTACT} ]]; then
             echo -e "\nThe following account has a potential joomla compromise:\n------------------------------"
             echo -e "Username ${HOMEDIR}:\n${COMCONTACT}";
-            echo -e "\nEdit the htaccess with:\nvim $(echo ${line} | awk '{print $2}')/.htaccess\n"
+            echo -e "\nEdit the htaccess with:\nvim $(echo ${line} | awk '{print $2}')/.htaccess"
+            echo -e "Put this in the htaccess:\n"
             cat << EOF
-Put this in the htaccess:
-
-# Joomla contact form blocked by <COMPANY> due to email abuse - 02/01/2020
+# Joomla contact form blocked by <COMPANY> due to email abuse - $(date +%D)
 RewriteCond %{QUERY_STRING} !^/?option=
 RewriteRule .? - [S=2]
 RewriteCond %{QUERY_STRING} !/?option=([a-z0-9_]+)&view=.* [NC]
@@ -86,11 +91,21 @@ RewriteRule .? - [R=403]
 RewriteCond %{QUERY_STRING} /?option=com_contact [NC]
 RewriteRule .? - [R=403]
 EOF
-            echo -e "\nSend this to au-servicedesk-alerts:\n\nCan someone get in touch with '"${HOMEDIR}"' on '$(facter fqdn)'\nCompromised joomla form on website '$(grep "${HOMEDIR}" /etc/trueuserdomains | awk -F: '{print $1}')' blocked in htaccess\nReseller Owner account name is '$(grep OWNER /var/cpanel/users/${USRNAME} | awk -F= '{print $2}')'\n------------------------------"
+            echo -e "\nSend this to au-servicedesk-alerts:"
+            echo "Can someone get in touch with '"${HOMEDIR}"' on '$(hostname)'"
+            echo "Compromised joomla form on website '$(grep "${HOMEDIR}" /etc/trueuserdomains | awk -F: '{print $1}')' blocked in htaccess"
+            if [[ ! $RESELLER =~ (dpresell|shared) ]]; then
+                echo "Reseller Owner account name is '${RESELLER}'\n------------------------------"
+            fi
         fi
     done
     # echo -e "sample of script sending logs from the IP:\n$(grep ${MSGIP} /home/${USRNAME}/access-logs/* 2> /dev/null | tail)\n"
-    echo -e "\nSend this to au-servicedesk-alerts:\n\nCan someone get in touch with '"${USRNAME}"' on '$(facter fqdn)'\nCompromised form on website '${DOMAIN}' is sending spam - blocked in htaccess\nReseller Owner account name is '$(grep OWNER /var/cpanel/users/${USRNAME} | awk -F= '{print $2}')'\n"
+    echo -e "\nSend this to au-servicedesk-alerts:"
+    echo -e "Can someone get in touch with '"${USRNAME}"' on '$(hostname)'"
+    echo -e "Compromised form on website '${DOMAIN}' is sending spam - blocked in htaccess"
+    if [[ ! $RESELLER =~ (dpresell|shared) ]]; then
+        echo "Reseller Owner account name is '${RESELLER}'\n------------------------------"
+    fi
 fi
 
 echo -e "\nClear the exim queue with (substitute <> with search term if email address needed):"
