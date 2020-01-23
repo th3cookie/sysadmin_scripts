@@ -213,6 +213,7 @@ alias traceroute='sudo traceroute -I'
 alias fireth3cookie='(firefox -P th3cookie &> /dev/null &disown)'
 alias firework='(firefox -P Work &> /dev/null &disown)'
 alias ovpn='sudo openvpn --config ~/work/hostopia.ovpn &'
+alias ss='sudo ss'
 EOF >> ~/.bash_aliases
 
 ##############
