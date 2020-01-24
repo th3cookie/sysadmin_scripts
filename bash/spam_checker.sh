@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
-# Usage -> MSGID="1itkoW-003Lav-J9"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh) $MSGID
+# Usage -> MSGID="1iurNJ-00FYz5-3u"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh) $MSGID
 # Usage 2 -> MSGID="1itJK6-004Keg-O7"; wget https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh -O ~/chk_spam.sh && chmod +x ~/chk_spam.sh; ~/chk_spam.sh $MSGID
 
 MSGID="$1";
@@ -71,7 +71,7 @@ else
     echo -e "It's not dovecot, Checking for compromised scripts...\n"
     SCRIPTSITES=$(grep cwd /var/log/exim_mainlog | grep -v /var/spool | awk -F"cwd=" '{print $2}' | grep -vP ^$ | awk '{print $1}' | sort | uniq -c | sort -n | grep -v '\/tmp\/\|\/usr\/local\|\/etc\/csf\|\/root\|\/$' | tail)
     echo -e "${SCRIPTSITES}\n"
-    echo -e "Checking Username ${USRNAME} for the most POST requests in apache logs.\nPlease investigate the below manually...\n"
+    echo -e "Checking Username '${USRNAME}' for the most POST requests in apache logs.\nPlease investigate the below manually...\n"
     echo -e "$(grep POST /home/${USRNAME}/access-logs/* | awk '{print $7}' | sort -n | uniq -c | sort -n)\n"
     # Doing Joomla Checks
     echo "${SCRIPTSITES}" | while read line; do
@@ -95,7 +95,7 @@ EOF
             echo "Can someone get in touch with '"${HOMEDIR}"' on '$(hostname)'"
             echo "Compromised joomla form on website '$(grep "${HOMEDIR}" /etc/trueuserdomains | awk -F: '{print $1}')' blocked in htaccess"
             if [[ ! $RESELLER =~ (dpresell|shared) ]]; then
-                echo "Reseller Owner account name is '${RESELLER}'\n------------------------------"
+                echo -e "Reseller Owner account name is '${RESELLER}'\n------------------------------"
             fi
         fi
     done
