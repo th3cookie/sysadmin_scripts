@@ -104,7 +104,7 @@ EOF
     echo -e "Can someone get in touch with '"${USRNAME}"' on '$(hostname)'"
     echo -e "Compromised form on website '${DOMAIN}' is sending spam - blocked in htaccess"
     if [[ ! $RESELLER =~ (dpresell|shared) ]]; then
-        echo "Reseller Owner account name is '${RESELLER}'\n------------------------------"
+        echo -e "Reseller Owner account name is '${RESELLER}'\n------------------------------"
     fi
 fi
 
