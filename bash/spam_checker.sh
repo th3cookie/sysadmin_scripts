@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
-# Usage -> MSGID="1iwCfm-004hm3-1c"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh) $MSGID
+# Usage -> MSGID="1iwBrC-004eFl-OV"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh) $MSGID
 # Usage 2 -> MSGID="1itJK6-004Keg-O7"; wget https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh -O ~/chk_spam.sh && chmod +x ~/chk_spam.sh; ~/chk_spam.sh $MSGID
 
 MSGID="$1";
@@ -83,7 +83,7 @@ else
             echo -e "\nEdit the htaccess with:\nvim $(echo ${line} | awk '{print $2}')/.htaccess"
             echo -e "Put this in the htaccess:\n"
             cat << EOF
-# Joomla contact form blocked by <COMPANY> due to email abuse - $(date +%D)
+# Joomla contact form blocked by <COMPANY> due to email abuse - $(date +%d/%m/%Y)
 RewriteCond %{QUERY_STRING} !^/?option=
 RewriteRule .? - [S=2]
 RewriteCond %{QUERY_STRING} !/?option=([a-z0-9_]+)&view=.* [NC]
