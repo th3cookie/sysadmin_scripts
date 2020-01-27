@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
-# Usage -> MSGID="1iurNJ-00FYz5-3u"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh) $MSGID
+# Usage -> MSGID="1iwCfm-004hm3-1c"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh) $MSGID
 # Usage 2 -> MSGID="1itJK6-004Keg-O7"; wget https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh -O ~/chk_spam.sh && chmod +x ~/chk_spam.sh; ~/chk_spam.sh $MSGID
 
 MSGID="$1";
@@ -64,7 +64,7 @@ if [[ -n ${DOVEMETHOD} ]]; then
         echo "Can someone please get in touch with '"${USRNAME}"' on '$(hostname)'"
         echo "Compromised email password has been rolled -> ${DOVERETURN}"
         if [[ ! $RESELLER =~ (dpresell|shared) ]]; then
-            echo "Reseller Owner account name is '${RESELLER}'\n--------------------------------------------------"
+            echo -e "Reseller Owner account name is '${RESELLER}'\n--------------------------------------------------"
         fi
     fi
 else
