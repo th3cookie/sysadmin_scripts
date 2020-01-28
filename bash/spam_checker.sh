@@ -78,7 +78,7 @@ else
         HOMEDIR=$(echo "${line}" | awk -F '/' '{print $3}' | grep -v ^$)
         COMCONTACT=$(grep POST /home/${HOMEDIR}/access-logs/* 2> /dev/null | grep 'com_contact' | awk '{print $7}' | sort -n | uniq -c | sort -n)
         if [[ -n ${COMCONTACT} ]]; then
-            echo -e "\nThe following account has a potential joomla compromise:\n------------------------------"
+            echo -e "\nThe following account has a potential joomla compromise:\n--------------------------------------------------------"
             echo -e "Username ${HOMEDIR}:\n${COMCONTACT}";
             echo -e "\nEdit the htaccess with:\nvim $(echo ${line} | awk '{print $2}')/.htaccess"
             echo -e "Put this in the htaccess:\n"
@@ -95,16 +95,19 @@ EOF
             echo "Can someone get in touch with '"${HOMEDIR}"' on '$(hostname)'"
             echo "Compromised joomla form on website '$(grep "${HOMEDIR}" /etc/trueuserdomains | awk -F: '{print $1}')' blocked in htaccess"
             if [[ ! $RESELLER =~ (dpresell|shared) ]]; then
-                echo -e "Reseller Owner account name is '${RESELLER}'\n------------------------------"
+                echo -e "Reseller Owner account name is '${RESELLER}'"
             fi
+            echo "--------------------------------------------------------"
         fi
     done
     # echo -e "sample of script sending logs from the IP:\n$(grep ${MSGIP} /home/${USRNAME}/access-logs/* 2> /dev/null | tail)\n"
-    echo -e "\nSend this to au-servicedesk-alerts:"
-    echo -e "Can someone get in touch with '"${USRNAME}"' on '$(hostname)'"
-    echo -e "Compromised form on website '${DOMAIN}' is sending spam - blocked in htaccess"
-    if [[ ! $RESELLER =~ (dpresell|shared) ]]; then
-        echo -e "Reseller Owner account name is '${RESELLER}'\n------------------------------"
+    if [[ ${HOMEDIR} != ${USRNAME} ]]; then
+        echo -e "\nSend this to au-servicedesk-alerts:"
+        echo -e "Can someone get in touch with '"${USRNAME}"' on '$(hostname)'"
+        echo -e "Compromised form on website '${DOMAIN}' is sending spam - blocked in htaccess"
+        if [[ ! $RESELLER =~ (dpresell|shared) ]]; then
+            echo -e "Reseller Owner account name is '${RESELLER}'\n------------------------------"
+        fi
     fi
 fi
 
