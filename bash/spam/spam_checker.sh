@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
-# Usage -> MSGID="1iww1i-002ABq-Dc"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh) $MSGID
+# Usage -> MSGID="1iwvaF-00EOYF-CT"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh) $MSGID
 # Usage 2 -> MSGID="1itJK6-004Keg-O7"; wget https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh -O ~/chk_spam.sh && chmod +x ~/chk_spam.sh; ~/chk_spam.sh $MSGID
 
 MSGID="$1";
@@ -71,8 +71,8 @@ else
     echo -e "It's not dovecot, Checking for compromised scripts...\n"
     SCRIPTSITES=$(grep cwd /var/log/exim_mainlog | grep -v /var/spool | awk -F"cwd=" '{print $2}' | grep -vP ^$ | awk '{print $1}' | sort | uniq -c | sort -n | grep -v '\/tmp\/\|\/usr\/local\|\/etc\/csf\|\/root\|\/$' | tail)
     echo -e "${SCRIPTSITES}\n"
-    echo -e "Checking Username '${USRNAME}' for the most POST requests in apache logs.\nPlease investigate the below manually...\n"
-    echo -e "$(grep POST /home/${USRNAME}/access-logs/* | awk '{print $7}' | sort -n | uniq -c | sort -n)\n"
+    echo -e "Checking Username '${USRNAME}' for the most POST requests in apache logs (last 20).\nPlease investigate the below manually...\n"
+    echo -e "$(grep POST /home/${USRNAME}/access-logs/* | awk '{print $7}' | sort -n | uniq -c | sort -n | tail -n 20)\n"
     # Doing Joomla Checks
     echo "${SCRIPTSITES}" | while read line; do
         HOMEDIR=$(echo "${line}" | awk -F '/' '{print $3}' | grep -v ^$)
