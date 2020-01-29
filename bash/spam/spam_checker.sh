@@ -1,7 +1,7 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
-# Usage -> MSGID="1iww1i-002ABq-Dc"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh) $MSGID
-# Usage 2 -> MSGID="1itJK6-004Keg-O7"; wget https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam_checker.sh -O ~/chk_spam.sh && chmod +x ~/chk_spam.sh; ~/chk_spam.sh $MSGID
+# Usage -> MSGID="1iww1i-002ABq-Dc"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh) $MSGID
+# Usage 2 -> MSGID="1itJK6-004Keg-O7"; wget https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh -O ~/chk_spam.sh && chmod +x ~/chk_spam.sh; ~/chk_spam.sh $MSGID
 
 MSGID="$1";
 if [[ -z $MSGID ]]; then
