@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
-# Usage -> MSGID="1iwvaF-00EOYF-CT"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh) $MSGID
+# Usage -> MSGID="1iyQRZ-0054Wk-CH"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh) $MSGID
 # Usage 2 -> MSGID="1itJK6-004Keg-O7"; wget https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh -O ~/chk_spam.sh && chmod +x ~/chk_spam.sh; ~/chk_spam.sh $MSGID
 
 MSGID="$1";
@@ -113,3 +113,4 @@ fi
 
 echo -e "\nClear the exim queue with (substitute <> with search term if email address needed):"
 echo "exim -bp | awk '/<>/{print \$3}' | xargs exim -Mrm"
+echo ""
