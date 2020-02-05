@@ -23,11 +23,11 @@ else
     fi
 fi
 DOVEMETHOD=$(echo "${MSG}" | grep -oP 'dovecot_(plain|login)')
-DOVERETURN=$(echo "${MSG}" | awk -v dove="$DOVEMETHOD" -F $DOVEMETHOD: '/dove/ {print $2}' | awk '{print $1}')
+EMAIL=$(echo "${MSG}" | awk -v dove="$DOVEMETHOD" -F $DOVEMETHOD: '/dove/ {print $2}' | awk '{print $1}')
 SUBJECT=$(echo "${MSG}" | grep "T=" | head -n 1 | grep -oP "T=\".*\"" | cut -d '"' -f 2)
 MSGIP=$(echo "${MSG}" | grep "H=" | head -n 1 | grep -oP "(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))" | tail -n 1)
 RETMSGIP=$?
-DOMAIN=$(echo ${DOVERETURN} | awk -F '@' '{print $2}')
+DOMAIN=$(echo ${EMAIL} | awk -F '@' '{print $2}')
 USRNAME=$(echo "${MSG}" | grep 'U=' | awk -F 'U=' '{print $2}' | grep -v mailnull | awk '{print $1}' | head -n 1)
 if [[ -z "${USRNAME}" ]]; then
     USRNAME=$(echo "${MSG}" | grep "SpamAssassin as" | awk -F 'SpamAssassin as' '{print $2}' | awk '{print $1}' | head -n 1)
@@ -57,12 +57,12 @@ if [[ -n ${DOVEMETHOD} ]]; then
         echo -e "mv -v /home/${USRNAME}/.cpanel/ssl/pending_queue.json{,.old}"
         echo -e "exim -bp | grep -B 1 ${DOMAIN} | grep \< | awk '{print \$3}' | xargs exim -Mrm\n"
     else
-        echo -e "Appears to be dovecot, the sending email is: ${DOVERETURN}"
+        echo -e "Appears to be dovecot, the sending email is: ${EMAIL}"
         echo "Use this command to roll the password (only if you know it's compromised):"
-        echo -e "/usr/local/cpanel/bin/uapi --user=${USRNAME} Email passwd_pop email=$(echo ${DOVERETURN} | awk -F '@' '{print $1}') password=$(openssl rand -base64 15) domain=$(echo ${DOVERETURN} | awk -F '@' '{print $2}')\n"
+        echo -e "/usr/local/cpanel/bin/uapi --user=${USRNAME} Email passwd_pop email=$(echo ${EMAIL} | awk -F '@' '{print $1}') password=$(openssl rand -base64 15) domain=$(echo ${EMAIL} | awk -F '@' '{print $2}')\n"
         echo "Send this to au-servicedesk-alerts:"
         echo "Can someone please get in touch with '"${USRNAME}"' on '$(hostname)'"
-        echo "Compromised email password has been rolled -> ${DOVERETURN}"
+        echo "Compromised email password has been rolled -> ${EMAIL}"
         if [[ ! $RESELLER =~ (dpresell|shared) ]]; then
             echo -e "Reseller Owner account name is '${RESELLER}'\n--------------------------------------------------"
         fi
@@ -112,5 +112,8 @@ EOF
 fi
 
 echo -e "\nClear the exim queue with (substitute <> with search term if email address needed):"
-echo "exim -bp | awk '/<>/{print \$3}' | xargs exim -Mrm"
+if [[ ! $(exim -bp | grep ${MSGID} | grep '<>') ]]; then
+    echo "exim -bp | awk '/${EMAIL}/{print \$3}' | xargs exim -Mrm"
+else
+    echo "exim -bp | awk '/<>/{print \$3}' | xargs exim -Mrm"
 echo ""
