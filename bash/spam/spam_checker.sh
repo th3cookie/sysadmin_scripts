@@ -111,7 +111,7 @@ EOF
     fi
 fi
 
-echo -e "\nClear the exim queue with (substitute <> with search term if email address needed):"
+echo -e "\nClear the exim queue with:"
 if [[ ! $(exim -bp | grep ${MSGID} | grep '<>') ]]; then
     echo "exim -bp | awk '/${EMAIL}/{print \$3}' | xargs exim -Mrm"
 else
