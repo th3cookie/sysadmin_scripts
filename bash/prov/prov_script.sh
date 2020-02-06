@@ -1,5 +1,4 @@
 #!/bin/bash
-# Things to check before running:
 
 echo "Please enter your sudo password..."
 sudo echo "Thank you. Continuing..."
@@ -11,6 +10,43 @@ then
     exit 1
 fi
 
+# Getting things ready
+PS3='Please enter your choice: '
+options=("Fedora/CentOS" "Ubuntu" "Quit")
+echo "Please select your OS:"
+select opt in "${options[@]}"
+do
+    case $opt in
+        "Fedora/CentOS")
+            if [[ -x $(command -v dnf) ]]; then
+                INSTALL_COMMAND=$(command -v dnf)
+                echo "I have found your package manager '${INSTALL_COMMAND}' for $opt. Continuing..."
+                break
+            elif [[ -x $(command -v yum) ]]; then
+                INSTALL_COMMAND=$(command -v yum)
+                echo "I have found your package manager '${INSTALL_COMMAND}' for $opt. Continuing..."
+                break
+            else
+                echo "I could not find your $opt package manager, try again..."
+            fi
+            ;;
+        "Ubuntu")
+            if [[ -x $(command -v apt) ]]; then
+                INSTALL_COMMAND=$(command -v apt)
+                echo "I have found your package manager '${INSTALL_COMMAND}' for $opt. Continuing..."
+                break
+            else
+                echo "I could not find your $opt package manager, try again..."
+            fi
+            ;;
+        "Quit")
+            echo "You have chosen to quit this program, exiting..."
+            exit 0
+            ;;
+        *) echo "invalid option $REPLY";;
+    esac
+done
+
 # Creating dir structure and properties
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 GIT_DIR=~/git
@@ -18,20 +54,6 @@ sudo mkdir $GIT_DIR
 chown -R $USER:$USER $GIT_DIR
 chmod 755 $GIT_DIR
 mkdir -p ~/work /mnt/NAS/Samis_folder
-
-if [[ -x $(command -v apt) ]]; then
-    INSTALL_COMMAND=$(command -v apt)
-    INSTALL_METHOD="apt"
-elif [[ -x $(command -v yum) ]]; then
-    INSTALL_COMMAND=$(command -v yum)
-    INSTALL_METHOD="yum"
-elif [[ -x $(command -v dnf) ]]; then
-    INSTALL_COMMAND=$(command -v dnf)
-    INSTALL_METHOD="dnf"
-else
-    echo "Cannot determine package manager, exiting..."
-    exit 1
-fi
 
 # Read user input and store in variables
 # Comment the below if the user is different
@@ -55,12 +77,14 @@ fi
 # Installing required packages
 $INSTALL_COMMAND update
 $INSTALL_COMMAND upgrade
-$INSTALL_COMMAND install -y cifs-utils openvpn facter ruby python3.8 firefox git bash-completion vim pip npm curl wget telnet
+$INSTALL_COMMAND install -y cifs-utils openvpn facter ruby python3.8 firefox git bash-completion vim pip npm curl wget telnet shellcheck
 if [[ $? -ne 0 ]]; then
     echo "Could not download some/all of the packages, please check package manager history."
 fi
 
-# Install further packages for work
+##################
+### Work Stuff ###
+##################
 if [[ ${WORKPC} =~ [Yy] ]]; then
     $INSTALL_COMMAND install -y sipcalc
     if [[ $? -ne 0 ]]; then
@@ -69,6 +93,7 @@ if [[ ${WORKPC} =~ [Yy] ]]; then
 fi
 
 # If not a work PC...
+# VPN -> https://sslvpn01.digitalpacific.com.au:942/?src=connect
 if [[ ! ${WORKPC} =~ [Yy] ]]; then
     # Downloading files from NAS
     sudo mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1.0 //10.0.0.3/Samis_Folder /mnt/NAS/Samis_folder/
@@ -98,11 +123,6 @@ if [[ ! ${WORKPC} =~ [Yy] ]]; then
     fi
 fi
 
-##################
-### Work Stuff ###
-##################
-# VPN -> https://sslvpn01.digitalpacific.com.au:942/?src=connect
-
 #################
 ### LAMP TIME ###
 #################
@@ -113,7 +133,7 @@ if [[ ! $? -ge 1 ]]; then
     sudo sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
 fi
 
-if [[ $INSTALL_METHOD =~ (dnf|yum) ]]; then
+if [[ $INSTALL_COMMAND =~ (dnf|yum) ]]; then
     # Do installs
     sudo $INSTALL_COMMAND -y install httpd php php-cli php-php-gettext php-mbstring php-mcrypt php-mysqlnd php-pear php-curl php-gd php-xml php-bcmath php-zip mariadb-server
     sudo $INSTALL_COMMAND -y groupinstall "Development tools" && yum install php-devel autoconf automake
@@ -168,7 +188,7 @@ DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
 FLUSH PRIVILEGES;
 EOF
-elif [[ $INSTALL_METHOD =~ apt ]]; then
+elif [[ $INSTALL_COMMAND =~ apt ]]; then
     sudo tasksel install lamp-server
     if [[ $? -ge 1 ]]; then
         sudo $INSTALL_COMMAND -y install mysql-server mysql-client libmysqlclient-dev apache2 apache2-doc apache2-npm-prefork apache2-utils libexpat1 ssl-cert \
