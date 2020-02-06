@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
-# Usage -> MSGID="1iyQRZ-0054Wk-CH"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh) $MSGID
+# Usage -> MSGID="1izlhQ-00ETrO-St"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh) $MSGID
 # Usage 2 -> MSGID="1itJK6-004Keg-O7"; wget https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh -O ~/chk_spam.sh && chmod +x ~/chk_spam.sh; ~/chk_spam.sh $MSGID
 
 MSGID="$1";
@@ -53,7 +53,7 @@ if [[ ${RETMSGIP} -eq 0 ]]; then
 fi
 if [[ -n ${DOVEMETHOD} ]]; then
     if [[ $SUBJECT =~ "SSL Pending Queue" ]]; then
-        echo -e "Appears to be broken SSL queue for username ${USRNAME}. Use this commands to roll the SSL and clear exim for this user:"
+        echo -e "Appears to be a broken SSL queue for username '${USRNAME}'. Use this commands to roll the SSL and clear exim for this user:"
         echo -e "mv -v /home/${USRNAME}/.cpanel/ssl/pending_queue.json{,.old}"
         echo -e "exim -bp | grep -B 1 ${DOMAIN} | grep \< | awk '{print \$3}' | xargs exim -Mrm\n"
     else
@@ -112,8 +112,9 @@ EOF
 fi
 
 echo -e "\nClear the exim queue with:"
-if [[ ! $(exim -bp | grep ${MSGID} | grep '<>') ]]; then
+if [[ ! $(exim -bp | grep ${MSGID} | grep '<>') ]] && [[ -n ${EMAIL} ]]; then
     echo "exim -bp | awk '/${EMAIL}/{print \$3}' | xargs exim -Mrm"
 else
     echo "exim -bp | awk '/<>/{print \$3}' | xargs exim -Mrm"
+fi
 echo ""
