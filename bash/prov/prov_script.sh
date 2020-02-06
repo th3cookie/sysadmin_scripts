@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Read user input and store in variables
 echo "Please enter your sudo password..."
 sudo echo "Thank you. Continuing..."
 
@@ -10,6 +11,16 @@ then
     exit 1
 fi
 
+read -p 'Is this a work desktop [Y/y]? ' WORKPC
+
+if [[ ! ${WORKPC} =~ [Yy] ]]; then
+    # Comment the below if the user is different
+    NAS_USER=admin
+    # Uncomment he below for user input instead
+    # read -p 'NAS Username: ' NAS_USER
+    read -sp 'NAS Password: ' NAS_PASS
+fi
+
 # Getting things ready
 PS3='Please enter your choice: '
 options=("Fedora/CentOS" "Ubuntu" "Quit")
@@ -18,12 +29,12 @@ select opt in "${options[@]}"
 do
     case $opt in
         "Fedora/CentOS")
-            if [[ -x $(command -v dnf) ]]; then
-                INSTALL_COMMAND=$(command -v dnf)
+            if [[ -x $(which dnf) ]]; then
+                INSTALL_COMMAND=$(which dnf)
                 echo "I have found your package manager '${INSTALL_COMMAND}' for $opt. Continuing..."
                 break
-            elif [[ -x $(command -v yum) ]]; then
-                INSTALL_COMMAND=$(command -v yum)
+            elif [[ -x $(which yum) ]]; then
+                INSTALL_COMMAND=$(which yum)
                 echo "I have found your package manager '${INSTALL_COMMAND}' for $opt. Continuing..."
                 break
             else
@@ -31,8 +42,8 @@ do
             fi
             ;;
         "Ubuntu")
-            if [[ -x $(command -v apt) ]]; then
-                INSTALL_COMMAND=$(command -v apt)
+            if [[ -x $(which apt) ]]; then
+                INSTALL_COMMAND=$(which apt)
                 echo "I have found your package manager '${INSTALL_COMMAND}' for $opt. Continuing..."
                 break
             else
@@ -55,29 +66,10 @@ chown -R $USER:$USER $GIT_DIR
 chmod 755 $GIT_DIR
 mkdir -p ~/work /mnt/NAS/Samis_folder
 
-# Read user input and store in variables
-# Comment the below if the user is different
-NAS_USER=admin
-# Uncomment he below for user input instead
-# read -p 'NAS Username: ' NAS_USER
-read -sp 'NAS Password: ' NAS_PASS
-read -p 'Is this a work desktop [Y/y]? ' WORKPC
-
-# Setup bash environment
-if [[ $(grep bash_alias .bashrc | wc -l) -eq 0 ]]
-then
-    cat << EOF
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
-fi
-EOF >> ~/.bashrc
-    touch ~/.bash_aliases
-fi
-
 # Installing required packages
 $INSTALL_COMMAND update
 $INSTALL_COMMAND upgrade
-$INSTALL_COMMAND install -y cifs-utils openvpn facter ruby python3.8 firefox git bash-completion vim pip npm curl wget telnet shellcheck
+$INSTALL_COMMAND install -y cifs-utils openvpn facter ruby python3.8 firefox git bash-completion vim pip npm curl wget telnet shellcheck xclip
 if [[ $? -ne 0 ]]; then
     echo "Could not download some/all of the packages, please check package manager history."
 fi
@@ -85,6 +77,7 @@ fi
 ##################
 ### Work Stuff ###
 ##################
+
 if [[ ${WORKPC} =~ [Yy] ]]; then
     $INSTALL_COMMAND install -y sipcalc
     if [[ $? -ne 0 ]]; then
@@ -93,7 +86,7 @@ if [[ ${WORKPC} =~ [Yy] ]]; then
 fi
 
 # If not a work PC...
-# VPN -> https://sslvpn01.digitalpacific.com.au:942/?src=connect
+# VPN to connect to work network -> https://sslvpn01.digitalpacific.com.au:942/?src=connect
 if [[ ! ${WORKPC} =~ [Yy] ]]; then
     # Downloading files from NAS
     sudo mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1.0 //10.0.0.3/Samis_Folder /mnt/NAS/Samis_folder/
@@ -201,10 +194,22 @@ else
     echo "Cannot install Lamp Stack on machine. This is due to unknown package manager or OS."
 fi
 
-###############
-### .bashrc ###
-###############
+##############################
+### Setup bash environment ###
+##############################
 
+if [[ $(grep bash_alias ~/.bashrc | wc -l) -lt 2 ]]
+then
+    cat << EOF >> ~/.bashrc
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+EOF
+    touch ~/.bash_aliases
+fi
+
+# .bashrc
 cat << EOF
 eval `ssh-agent` &> /dev/null
 ssh-add ~/.ssh/sami-openssh-private-key.ppk &> /dev/null
@@ -214,10 +219,7 @@ ssh-add ~/.ssh/SShakir-openssh-private-key &> /dev/null
 EOF >> ~/.bashrc
 echo -e "#sudo mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1.0 //10.0.0.3/Samis_Folder /mnt/NAS/Samis_folder/" >> ~/.bashrc
 
-#####################
-### .bash_aliases ###
-#####################
-
+# .bash_aliases
 cat << EOF
 alias dnf='sudo dnf'
 alias apt='sudo apt'
@@ -227,14 +229,15 @@ alias ssh='ssh -oStrictHostKeyChecking=no'
 alias crucial='ssh root@182.160.155.217'
 alias dpded='ssh ded.somethinglikesami.net -p 7022'
 alias reslack='pkill slack && slack'
-alias gitpushall='echo -e "\n$PWD\n------------------------\n" && git status && git add . && git commit -m "auto commit from $(hostname)" && git push origin'
-alias gitpullall='echo -e "\n$PWD\n------------------------\n" && git status && git pull'
+alias gitpushall='echo -e "\n\$PWD\n------------------------\n" && git status && git add . && git commit -m "auto commit from \$(hostname)" && git push origin'
+alias gitpullall='echo -e "\n\$PWD\n------------------------\n" && git status && git pull'
 alias traceroute='sudo traceroute -I'
 alias fireth3cookie='(firefox -P th3cookie &> /dev/null &disown)'
 alias firework='(firefox -P Work &> /dev/null &disown)'
 alias ovpn='sudo openvpn --config ~/work/hostopia.ovpn &'
 alias ss='sudo ss'
 alias systemctl='sudo systemctl'
+alias copy='xclip -sel clip'
 EOF >> ~/.bash_aliases
 
 ##############
