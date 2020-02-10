@@ -69,12 +69,13 @@ GIT_DIR=${HOME_DIR}/git
 mkdir $GIT_DIR
 chown -R $REAL_USER:$REAL_USER $GIT_DIR
 chmod 755 $GIT_DIR
-mkdir -p ${HOME_DIR}/work /mnt/NAS/Samis_folder
+mkdir -p ${HOME_DIR}/work ${HOME_DIR}/Downloads /mnt/NAS/Samis_folder 
 
 # Installing required packages
 $INSTALL_COMMAND update
 $INSTALL_COMMAND upgrade
-$INSTALL_COMMAND install -y cifs-utils openvpn facter ruby puppet python3.8 firefox git bash-completion vim pip npm curl wget telnet ShellCheck xclip subnetcalc
+$INSTALL_COMMAND install -y cifs-utils openvpn facter ruby puppet python3.8 firefox git bash-completion vim pip npm curl wget telnet ShellCheck xclip subnetcalc \
+snapd
 if [[ $? -ne 0 ]]; then
     echo "Could not download some/all of the packages, please check package manager history."
 fi
@@ -98,9 +99,10 @@ if [[ ! ${WORKPC} =~ [Yy] ]]; then
     if [[ $? -ne 0 ]]; then
         echo -e "Could not download openvpn profile and SSH keys from NAS.\nCheck if you can mount cifs or not."
     else
-        cp /mnt/NAS/Samis_folder/hostopia.ovpn ${HOME_DIR}/work
-        cp /mnt/NAS/Samis_folder/ssh_keys/sami-openssh-private-key.ppk ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk
-        cp /mnt/NAS/Samis_folder/ssh_keys/Work/SShakir-openssh-private-key ${HOME_DIR}/.ssh/SShakir-openssh-private-key
+        cp /mnt/NAS/Samis_folder/ops/hostopia.ovpn ${HOME_DIR}/work
+        cp /mnt/NAS/Samis_folder/ops/ssh_keys/sami-openssh-private-key.ppk ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk
+        cp /mnt/NAS/Samis_folder/ops/ssh_keys/Work/SShakir-openssh-private-key ${HOME_DIR}/.ssh/SShakir-openssh-private-key
+        cp /mnt/NAS/Samis_folder/ops/prov_apps/* ${HOME_DIR}/Downloads/
     fi
     echo -e 'Downloading tor. It then needs to be extracted and placed in a $PATH directory to be able to start.'
     echo -e 'If TOR Fails to download, do it yourself :).'
@@ -240,6 +242,7 @@ alias ovpn='sudo openvpn --config ~/work/hostopia.ovpn &'
 alias ss='sudo ss'
 alias systemctl='sudo systemctl'
 alias copy='xclip -sel clip'
+alias spotify='spotify &'
 EOF
 
 . ${HOME_DIR}/.bash_aliases
@@ -249,6 +252,17 @@ EOF
 ### Others ###
 ##############
 
+# Installing local rpm's
+cd ${HOME_DIR}/Downloads/
+sudo dnf localinstall slack-* code-*
+
 cp $SCRIPT_DIR/configs/.vimrc ${HOME_DIR}/
+
+# Configuring Snapd
+systemctl start snapd.service
+systemctl start snapd.service
+
+# Installing spotify
+snap install spotify
 
 echo "Please install NVIDIA Graphics drivers if you have an NVIDIA card -> https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/"
