@@ -16,6 +16,8 @@ fi
 read -p 'Is this a work desktop [Y/y]? ' WORKPC
 read -p 'Please set your computer hostname: ' PC_HOSTNAME
 hostnamectl set-hostname ${PC_HOSTNAME}
+read -p 'Git username: ' GIT_USERNAME
+read -p 'Git Email: ' GIT_EMAIL
 
 if [[ ! ${WORKPC} =~ [Yy] ]]; then
     # Comment the below if the user is different
@@ -101,6 +103,7 @@ if [[ ! ${WORKPC} =~ [Yy] ]]; then
     else
         cp /mnt/NAS/Samis_folder/ops/hostopia.ovpn ${HOME_DIR}/work
         cp /mnt/NAS/Samis_folder/ops/ssh_keys/sami-openssh-private-key.ppk ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk
+        chmod 600 ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk ${HOME_DIR}/.ssh/SShakir-openssh-private-key
         cp /mnt/NAS/Samis_folder/ops/ssh_keys/Work/SShakir-openssh-private-key ${HOME_DIR}/.ssh/SShakir-openssh-private-key
         cp /mnt/NAS/Samis_folder/ops/prov_apps/* ${HOME_DIR}/Downloads/
     fi
@@ -266,5 +269,16 @@ systemctl start snapd.service
 
 # Installing spotify
 snap install spotify
+
+eval `ssh-agent` &> /dev/null
+ssh-add ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk
+
+cd ${HOME_DIR}/git
+git config --global user.name "${GIT_USERNAME}"
+git config --global user.email "${GIT_EMAIL}"
+
+git clone git@github.com:th3cookie/StudyScripts.git
+git clone git@github.com:th3cookie/sysadmin_scripts.git
+git clone git@github.com:th3cookie/Website_Dev.git
 
 echo "Please install NVIDIA Graphics drivers if you have an NVIDIA card -> https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/"
