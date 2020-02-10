@@ -28,9 +28,8 @@ if [[ ! ${WORKPC} =~ [Yy] ]]; then
 fi
 
 # Getting things ready
-PS3='Please enter your choice: '
+PS3='Please select your OS: '
 options=("Fedora/CentOS" "Ubuntu" "Quit")
-echo "Please select your OS:"
 select opt in "${options[@]}"
 do
     case $opt in
@@ -57,7 +56,6 @@ do
             fi
             ;;
         "Quit")
-            echo "You have chosen to quit this program, exiting..."
             exit 0
             ;;
         *) echo "invalid option $REPLY";;
@@ -76,7 +74,7 @@ mkdir -p ${HOME_DIR}/work /mnt/NAS/Samis_folder
 # Installing required packages
 $INSTALL_COMMAND update
 $INSTALL_COMMAND upgrade
-$INSTALL_COMMAND install -y cifs-utils openvpn facter ruby python3.8 firefox git bash-completion vim pip npm curl wget telnet shellcheck xclip subnetcalc
+$INSTALL_COMMAND install -y cifs-utils openvpn facter ruby puppet python3.8 firefox git bash-completion vim pip npm curl wget telnet ShellCheck xclip subnetcalc
 if [[ $? -ne 0 ]]; then
     echo "Could not download some/all of the packages, please check package manager history."
 fi
@@ -136,7 +134,7 @@ fi
 if [[ $INSTALL_COMMAND =~ (dnf|yum) ]]; then
     # Do installs
     $INSTALL_COMMAND -y install httpd php php-cli php-php-gettext php-mbstring php-mcrypt php-mysqlnd php-pear php-curl php-gd php-xml php-bcmath php-zip mariadb-server
-    $INSTALL_COMMAND -y groupinstall "Development tools" && yum install php-devel autoconf automake
+    $INSTALL_COMMAND -y groupinstall "Development tools" && $INSTALL_COMMAND -y install php-devel autoconf automake
 
     # Configure Apache
     echo "Installing and configuring Apache..."
@@ -163,18 +161,13 @@ if [[ $INSTALL_COMMAND =~ (dnf|yum) ]]; then
 
     # Do MariaDB
     echo "Installing and configuring MariaDB..."
+    chown -R mysql. /var/lib/mysql
     mv /etc/my.cnf.d/mariadb-server.cnf{,.old}
     cp $SCRIPT_DIR/configs/mariadb-server.cnf /etc/my.cnf.d/mariadb-server.cnf
-    mysql_secure_installation
     systemctl start mariadb
     systemctl enable mariadb
     firewall-cmd --add-service=mysql --permanent
     firewall-cmd --reload
-    rm -rf /var/lib/mysql
-    mkdir /var/lib/mysql
-    mkdir /var/lib/mysql/mysql
-    chown -R mysql:mysql /var/lib/mysql
-    mysql_install_db
     # In lieu of using mysql_secure_installation, this will require no prompt from user
     rootpass=$(date +%s | sha256sum | base64 | head -c 12 ; echo)
     echo "[client]" > ${HOME_DIR}/.my.cnf
@@ -212,13 +205,15 @@ then
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
+
 EOF
     touch ${HOME_DIR}/.bash_aliases
 fi
 
 # .bashrc
 cat << EOF >> ${HOME_DIR}/.bashrc
-eval `ssh-agent` &> /dev/null
+# SSH Stuff
+eval \`ssh-agent\` &> /dev/null
 ssh-add ~/.ssh/sami-openssh-private-key.ppk &> /dev/null
 ssh-add ~/.ssh/SShakir-openssh-private-key &> /dev/null
 
@@ -247,8 +242,13 @@ alias systemctl='sudo systemctl'
 alias copy='xclip -sel clip'
 EOF
 
+. ${HOME_DIR}/.bash_aliases
+. ${HOME_DIR}/.bashrc
+
 ##############
 ### Others ###
 ##############
 
 cp $SCRIPT_DIR/configs/.vimrc ${HOME_DIR}/
+
+echo "Please install NVIDIA Graphics drivers if you have an NVIDIA card -> https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/"
