@@ -106,10 +106,11 @@ if [[ ! ${WORKPC} =~ [Yy] ]]; then
     fi
     echo -e 'Downloading tor. It then needs to be extracted and placed in a $PATH directory to be able to start.'
     echo -e 'If TOR Fails to download, do it yourself :).'
-    TORVERS='9.0.4'
+    TORVERS="9.0.4"
+    TORFILE="tor-browser-linux64-${TORVERS}_en-US.tar.xz"
     cd ${HOME_DIR}
     # Double check the link is right if this fails...
-    wget --progress=bar https://www.torproject.org/dist/torbrowser/${TORVERS}/tor-browser-linux64-${TORVERS}_en-US.tar.xz
+    wget --progress=bar https://www.torproject.org/dist/torbrowser/${TORVERS}/${TORFILE}
     if [[ $? -ge 1 ]]; then
         echo "Could not download TOR. Go to 'https://www.torproject.org/download/' to download and extract it manually\n"
     else
@@ -118,6 +119,7 @@ if [[ ! ${WORKPC} =~ [Yy] ]]; then
             echo -e "Could not extract the file '$(pwd)/tor-browser-linux64-${TORVERS}_en-US.tar.xz'\nPlease do so manually with the following command."
             echo -e "tar -xvf tor-browser-linux64-${TORVERS}_en-US.tar.xz"
         else
+            rm -f ${TORFILE}
             echo -e "Tor has been downloaded to '$(pwd)'. Call it directly in shell or put it in a \$PATH dir to open the program."
         fi
     fi
