@@ -1,16 +1,18 @@
 #!/bin/bash
 
-# Read user input and store in variables
-echo "Please enter your sudo password..."
-sudo echo "Thank you. Continuing..."
-
 # If no sudo - quit
-if [[ $? -eq 1 ]]
-then
-    echo "Incorrect sudo password, cannot continue. Exiting..."
-    exit 1
+if ! [ $(id -u) = 0 ]; then
+   echo "The script need to be run as root." >&2
+   exit 1
 fi
 
+if [ $SUDO_USER ]; then
+    real_user=$SUDO_USER
+else
+    real_user=$(whoami)
+fi
+
+# Read user input and store in variables
 read -p 'Is this a work desktop [Y/y]? ' WORKPC
 
 if [[ ! ${WORKPC} =~ [Yy] ]]; then
