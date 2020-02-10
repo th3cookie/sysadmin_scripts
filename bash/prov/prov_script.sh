@@ -7,19 +7,23 @@ if ! [ $(id -u) = 0 ]; then
 fi
 
 if [ $SUDO_USER ]; then
-    real_user=$SUDO_USER
+    REAL_USER=$SUDO_USER
 else
-    real_user=$(whoami)
+    REAL_USER=$(whoami)
 fi
 
 # Read user input and store in variables
 read -p 'Is this a work desktop [Y/y]? ' WORKPC
+read -p 'Please set your computer hostname: ' PC_HOSTNAME
+hostnamectl set-hostname ${PC_HOSTNAME}
 
 if [[ ! ${WORKPC} =~ [Yy] ]]; then
     # Comment the below if the user is different
     NAS_USER=admin
-    # Uncomment he below for user input instead
-    # read -p 'NAS Username: ' NAS_USER
+
+    if [[ -z ${NAS_USER} ]]; then
+        read -p 'NAS Username: ' NAS_USER
+    fi
     read -sp 'NAS Password: ' NAS_PASS
 fi
 
@@ -62,16 +66,17 @@ done
 
 # Creating dir structure and properties
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-GIT_DIR=~/git
-sudo mkdir $GIT_DIR
-chown -R $USER:$USER $GIT_DIR
+HOME_DIR=/home/${REAL_USER}
+GIT_DIR=${HOME_DIR}/git
+mkdir $GIT_DIR
+chown -R $REAL_USER:$REAL_USER $GIT_DIR
 chmod 755 $GIT_DIR
-mkdir -p ~/work /mnt/NAS/Samis_folder
+mkdir -p ${HOME_DIR}/work /mnt/NAS/Samis_folder
 
 # Installing required packages
 $INSTALL_COMMAND update
 $INSTALL_COMMAND upgrade
-$INSTALL_COMMAND install -y cifs-utils openvpn facter ruby python3.8 firefox git bash-completion vim pip npm curl wget telnet shellcheck xclip
+$INSTALL_COMMAND install -y cifs-utils openvpn facter ruby python3.8 firefox git bash-completion vim pip npm curl wget telnet shellcheck xclip subnetcalc
 if [[ $? -ne 0 ]]; then
     echo "Could not download some/all of the packages, please check package manager history."
 fi
@@ -80,29 +85,29 @@ fi
 ### Work Stuff ###
 ##################
 
-if [[ ${WORKPC} =~ [Yy] ]]; then
-    $INSTALL_COMMAND install -y sipcalc
-    if [[ $? -ne 0 ]]; then
-        echo "Could not download some/all of the work packages, please check package manager history."
-    fi
-fi
+# if [[ ${WORKPC} =~ [Yy] ]]; then
+#     $INSTALL_COMMAND install -y 
+#     if [[ $? -ne 0 ]]; then
+#         echo "Could not download some/all of the work packages, please check package manager history."
+#     fi
+# fi
 
 # If not a work PC...
 # VPN to connect to work network -> https://sslvpn01.digitalpacific.com.au:942/?src=connect
 if [[ ! ${WORKPC} =~ [Yy] ]]; then
     # Downloading files from NAS
-    sudo mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1.0 //10.0.0.3/Samis_Folder /mnt/NAS/Samis_folder/
+    mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1.0 //10.0.0.3/Samis_Folder /mnt/NAS/Samis_folder/
     if [[ $? -ne 0 ]]; then
         echo -e "Could not download openvpn profile and SSH keys from NAS.\nCheck if you can mount cifs or not."
     else
-        cp /mnt/NAS/Samis_Folder/hostopia.ovpn ~/work
-        cp /mnt/NAS/Samis_Folder/ssh_keys/sami-openssh-private-key.ppk ~/.ssh/sami-openssh-private-key.ppk
-        cp /mnt/NAS/Samis_Folder/ssh_keys/Work/SShakir-openssh-private-key ~/.ssh/SShakir-openssh-private-key
+        cp /mnt/NAS/Samis_folder/hostopia.ovpn ${HOME_DIR}/work
+        cp /mnt/NAS/Samis_folder/ssh_keys/sami-openssh-private-key.ppk ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk
+        cp /mnt/NAS/Samis_folder/ssh_keys/Work/SShakir-openssh-private-key ${HOME_DIR}/.ssh/SShakir-openssh-private-key
     fi
     echo -e 'Downloading tor. It then needs to be extracted and placed in a $PATH directory to be able to start.'
     echo -e 'If TOR Fails to download, do it yourself :).'
     TORVERS='9.0.4'
-    cd ~
+    cd ${HOME_DIR}
     # Double check the link is right if this fails...
     wget --progress=bar https://www.torproject.org/dist/torbrowser/${TORVERS}/tor-browser-linux64-${TORVERS}_en-US.tar.xz
     if [[ $? -ge 1 ]]; then
@@ -124,58 +129,58 @@ fi
 
 sestatus | grep 'SELinux status' | grep -qi enabled
 if [[ ! $? -ge 1 ]]; then
-    sudo setenforce 0
-    sudo sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
+    setenforce 0
+    sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
 fi
 
 if [[ $INSTALL_COMMAND =~ (dnf|yum) ]]; then
     # Do installs
-    sudo $INSTALL_COMMAND -y install httpd php php-cli php-php-gettext php-mbstring php-mcrypt php-mysqlnd php-pear php-curl php-gd php-xml php-bcmath php-zip mariadb-server
-    sudo $INSTALL_COMMAND -y groupinstall "Development tools" && yum install php-devel autoconf automake
+    $INSTALL_COMMAND -y install httpd php php-cli php-php-gettext php-mbstring php-mcrypt php-mysqlnd php-pear php-curl php-gd php-xml php-bcmath php-zip mariadb-server
+    $INSTALL_COMMAND -y groupinstall "Development tools" && yum install php-devel autoconf automake
 
     # Configure Apache
     echo "Installing and configuring Apache..."
-    sudo mv /etc/httpd/conf/httpd.conf{,.old}
-    sudo cp $SCRIPT_DIR/configs/httpd.conf /etc/httpd/conf/httpd.conf
-    sudo mv /etc/httpd/conf.d/userdir.conf{,.old}
-    sudo cp $SCRIPT_DIR/configs/userdir.conf /etc/httpd/conf.d/userdir.conf
-    chmod 711 ~
-    sudo systemctl start httpd
-    sudo systemctl enable httpd
-    sudo firewall-cmd --add-service={http,https} --permanent
-    sudo firewall-cmd --reload
-    echo "You can find your website at 'http://localhost/~${USER}'."
+    mv /etc/httpd/conf/httpd.conf{,.old}
+    cp $SCRIPT_DIR/configs/httpd.conf /etc/httpd/conf/httpd.conf
+    mv /etc/httpd/conf.d/userdir.conf{,.old}
+    cp $SCRIPT_DIR/configs/userdir.conf /etc/httpd/conf.d/userdir.conf
+    chmod 711 ${HOME_DIR}
+    systemctl start httpd
+    systemctl enable httpd
+    firewall-cmd --add-service={http,https} --permanent
+    firewall-cmd --reload
+    echo "You can find your website at 'http://localhost/~${REAL_USER}'."
     echo "You can pull your git repo's in here to work on them locally."
 
     # Do PHP
     echo "Installing and configuring PHP..."
-    sudo mv /etc/php.ini{,.old}
-    sudo cp $SCRIPT_DIR/configs/php.ini /etc/php.ini
-    sudo cp $SCRIPT_DIR/configs/info.php ~/git/
-    sudo systemctl reload httpd
-    sudo pecl install xdebug
-    sudo systemctl restart php-fpm
+    mv /etc/php.ini{,.old}
+    cp $SCRIPT_DIR/configs/php.ini /etc/php.ini
+    cp $SCRIPT_DIR/configs/info.php ${HOME_DIR}/git/
+    systemctl reload httpd
+    pecl install xdebug
+    systemctl restart php-fpm
 
     # Do MariaDB
     echo "Installing and configuring MariaDB..."
-    sudo mv /etc/my.cnf.d/mariadb-server.cnf{,.old}
-    sudo cp $SCRIPT_DIR/configs/mariadb-server.cnf /etc/my.cnf.d/mariadb-server.cnf
+    mv /etc/my.cnf.d/mariadb-server.cnf{,.old}
+    cp $SCRIPT_DIR/configs/mariadb-server.cnf /etc/my.cnf.d/mariadb-server.cnf
     mysql_secure_installation
-    sudo systemctl start mariadb
-    sudo systemctl enable mariadb
-    sudo firewall-cmd --add-service=mysql --permanent
-    sudo firewall-cmd --reload
-    sudo rm -rf /var/lib/mysql
-    sudo mkdir /var/lib/mysql
-    sudo mkdir /var/lib/mysql/mysql
-    sudo chown -R mysql:mysql /var/lib/mysql
-    sudo mysql_install_db
+    systemctl start mariadb
+    systemctl enable mariadb
+    firewall-cmd --add-service=mysql --permanent
+    firewall-cmd --reload
+    rm -rf /var/lib/mysql
+    mkdir /var/lib/mysql
+    mkdir /var/lib/mysql/mysql
+    chown -R mysql:mysql /var/lib/mysql
+    mysql_install_db
     # In lieu of using mysql_secure_installation, this will require no prompt from user
     rootpass=$(date +%s | sha256sum | base64 | head -c 12 ; echo)
-    echo "[client]" > ~/.my.cnf
-    echo "user=root" >> ~/.my.cnf
-    echo "password=${rootpass}" >> ~/.my.cnf
-    echo "Mysql root password stored in ~/.my.cnf"
+    echo "[client]" > ${HOME_DIR}/.my.cnf
+    echo "user=root" >> ${HOME_DIR}/.my.cnf
+    echo "password=${rootpass}" >> ${HOME_DIR}/.my.cnf
+    echo "Mysql root password stored in ${HOME_DIR}/.my.cnf"
     mysql -u root <<-EOF
 UPDATE mysql.user SET Password=PASSWORD('$rootpass') WHERE User='root';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
@@ -184,14 +189,14 @@ DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
 FLUSH PRIVILEGES;
 EOF
 elif [[ $INSTALL_COMMAND =~ apt ]]; then
-    sudo tasksel install lamp-server
+    tasksel install lamp-server
     if [[ $? -ge 1 ]]; then
-        sudo $INSTALL_COMMAND -y install mysql-server mysql-client libmysqlclient-dev apache2 apache2-doc apache2-npm-prefork apache2-utils libexpat1 ssl-cert \
+        $INSTALL_COMMAND -y install mysql-server mysql-client libmysqlclient-dev apache2 apache2-doc apache2-npm-prefork apache2-utils libexpat1 ssl-cert \
         libapache2-mod-php7.0 php7.0 php7.0-common php7.0-curl php7.0-dev php7.0-gd php-pear php-imagick php7.0-mcrypt php7.0-mysql php7.0-ps php7.0-xsl phpmyadmin
     fi
-    sudo ufw allow in "Apache Full"
-    sudo a2enmod mpm_event
-    sudo systemctl restart apache2
+    ufw allow in "Apache Full"
+    a2enmod mpm_event
+    systemctl restart apache2
 else
     echo "Cannot install Lamp Stack on machine. This is due to unknown package manager or OS."
 fi
@@ -200,29 +205,29 @@ fi
 ### Setup bash environment ###
 ##############################
 
-if [[ $(grep bash_alias ~/.bashrc | wc -l) -lt 2 ]]
+if [[ $(grep bash_alias ${HOME_DIR}/.bashrc | wc -l) -lt 2 ]]
 then
-    cat << EOF >> ~/.bashrc
+    cat << EOF >> ${HOME_DIR}/.bashrc
 
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 EOF
-    touch ~/.bash_aliases
+    touch ${HOME_DIR}/.bash_aliases
 fi
 
 # .bashrc
-cat << EOF
+cat << EOF >> ${HOME_DIR}/.bashrc
 eval `ssh-agent` &> /dev/null
 ssh-add ~/.ssh/sami-openssh-private-key.ppk &> /dev/null
 ssh-add ~/.ssh/SShakir-openssh-private-key &> /dev/null
 
 # Change Password and you also need to install samba if this fails - sudo dnf install samba
-EOF >> ~/.bashrc
-echo -e "#sudo mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1.0 //10.0.0.3/Samis_Folder /mnt/NAS/Samis_folder/" >> ~/.bashrc
+EOF
+echo -e "#sudo mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1.0 //10.0.0.3/Samis_Folder /mnt/NAS/Samis_folder/" >> ${HOME_DIR}/.bashrc
 
 # .bash_aliases
-cat << EOF
+cat << EOF >> ${HOME_DIR}/.bash_aliases
 alias dnf='sudo dnf'
 alias apt='sudo apt'
 alias yum='sudo yum'
@@ -240,10 +245,10 @@ alias ovpn='sudo openvpn --config ~/work/hostopia.ovpn &'
 alias ss='sudo ss'
 alias systemctl='sudo systemctl'
 alias copy='xclip -sel clip'
-EOF >> ~/.bash_aliases
+EOF
 
 ##############
 ### Others ###
 ##############
 
-sudo cp $SCRIPT_DIR/configs/.vimrc ~/
+cp $SCRIPT_DIR/configs/.vimrc ${HOME_DIR}/
