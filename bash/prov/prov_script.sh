@@ -3,6 +3,7 @@
 # If no sudo - quit
 if ! [ $(id -u) = 0 ]; then
    echo "The script need to be run as root." >&2
+   echo "Please call it with --> sudo $0"
    exit 1
 fi
 
