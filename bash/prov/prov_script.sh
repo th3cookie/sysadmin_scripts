@@ -280,3 +280,11 @@ git clone git@github.com:th3cookie/sysadmin_scripts.git
 git clone git@github.com:th3cookie/Website_Dev.git
 
 echo "Please install NVIDIA Graphics drivers if you have an NVIDIA card -> https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/"
+
+# Installing RPM Fusion packages last
+if [[ $INSTALL_COMMAND =~ (dnf|yum) ]]; then
+    $INSTALL_COMMAND install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+    $INSTALL_COMMAND install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+fi
+
+$INSTALL_COMMAND install -y ffmpeg vlc
