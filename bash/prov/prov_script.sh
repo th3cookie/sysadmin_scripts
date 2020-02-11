@@ -16,8 +16,8 @@ fi
 read -p 'Is this a work desktop [Y/y]? ' WORKPC
 read -p 'Please set your computer hostname: ' PC_HOSTNAME
 hostnamectl set-hostname ${PC_HOSTNAME}
-read -p 'Git username: ' GIT_USERNAME
-read -p 'Git Email: ' GIT_EMAIL
+read -p 'Git Config username: ' GIT_USERNAME
+read -p 'Git Config Email: ' GIT_EMAIL
 
 if [[ ! ${WORKPC} =~ [Yy] ]]; then
     # Comment the below if the user is different
@@ -212,13 +212,13 @@ then
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
-
 EOF
     touch ${HOME_DIR}/.bash_aliases
 fi
 
 # .bashrc
 cat << EOF >> ${HOME_DIR}/.bashrc
+
 # SSH Stuff
 eval \`ssh-agent\` &> /dev/null
 ssh-add ~/.ssh/sami-openssh-private-key.ppk &> /dev/null
@@ -230,9 +230,6 @@ echo -e "#sudo mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1
 
 # .bash_aliases
 cat << EOF >> ${HOME_DIR}/.bash_aliases
-alias dnf='sudo dnf'
-alias apt='sudo apt'
-alias yum='sudo yum'
 alias hosts='sudo vim /etc/hosts'
 alias ssh='ssh -oStrictHostKeyChecking=no'
 alias crucial='ssh root@182.160.155.217'
