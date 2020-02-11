@@ -288,3 +288,7 @@ if [[ $INSTALL_COMMAND =~ (dnf|yum) ]]; then
 fi
 
 $INSTALL_COMMAND install -y ffmpeg vlc
+
+if [[ $? -ne 0 ]]; then
+    echo "Could not download some/all of the 'RPM Fusion' packages, please check package manager history."
+fi
