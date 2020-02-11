@@ -78,7 +78,7 @@ mkdir -p ${HOME_DIR}/work ${HOME_DIR}/Downloads /mnt/NAS/Samis_folder
 $INSTALL_COMMAND update
 $INSTALL_COMMAND upgrade
 $INSTALL_COMMAND install -y cifs-utils openvpn facter ruby puppet python3.8 firefox git bash-completion vim pip npm curl wget telnet ShellCheck xclip subnetcalc \
-snapd
+snapd grub-customizer
 if [[ $? -ne 0 ]]; then
     echo "Could not download some/all of the packages, please check package manager history."
 fi
@@ -283,6 +283,9 @@ echo "Please install NVIDIA Graphics drivers if you have an NVIDIA card -> https
 
 # Installing RPM Fusion packages last
 if [[ $INSTALL_COMMAND =~ (dnf|yum) ]]; then
+    echo "Making Windows the default in grub conf..."
+    WINDOWS_LABEL=$(grep -Pi windows /boot/grub2/grub.cfg | cut -d "'" -f2)
+
     $INSTALL_COMMAND install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
     $INSTALL_COMMAND install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 fi
