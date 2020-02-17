@@ -87,16 +87,14 @@ fi
 ### Work Stuff ###
 ##################
 
-# if [[ ${WORKPC} =~ [Yy] ]]; then
-#     $INSTALL_COMMAND install -y 
-#     if [[ $? -ne 0 ]]; then
-#         echo "Could not download some/all of the work packages, please check package manager history."
-#     fi
-# fi
-
-# If not a work PC...
-# VPN to connect to work network -> https://sslvpn01.digitalpacific.com.au:942/?src=connect
-if [[ ! ${WORKPC} =~ [Yy] ]]; then
+if [[ ${WORKPC} =~ [Yy] ]]; then
+    echo "work PC"
+else
+    # If not a work PC...
+    # VPN to connect to work network -> https://sslvpn01.digitalpacific.com.au:942/?src=connect
+    cat << EOF >> ${HOME_DIR}/.bash_aliases
+alias ovpn='sudo openvpn --config ~/work/hostopia.ovpn &'
+EOF
     # Downloading files from NAS
     mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1.0 //10.0.0.3/Samis_Folder /mnt/NAS/Samis_folder/
     if [[ $? -ne 0 ]]; then
@@ -127,6 +125,8 @@ if [[ ! ${WORKPC} =~ [Yy] ]]; then
             echo -e "Tor has been downloaded to '$(pwd)'. Call it directly in shell or put it in a \$PATH dir to open the program."
         fi
     fi
+    echo "# Change Password and you also need to install samba if this fails - sudo dnf install samba" >> ${HOME_DIR}/.bashrc
+    echo -e "#sudo mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1.0 //10.0.0.3/Samis_Folder /mnt/NAS/Samis_folder/" >> ${HOME_DIR}/.bashrc
 fi
 
 #################
@@ -225,9 +225,7 @@ eval \`ssh-agent\` &> /dev/null
 ssh-add ~/.ssh/sami-openssh-private-key.ppk &> /dev/null
 ssh-add ~/.ssh/SShakir-openssh-private-key &> /dev/null
 
-# Change Password and you also need to install samba if this fails - sudo dnf install samba
 EOF
-echo -e "#sudo mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1.0 //10.0.0.3/Samis_Folder /mnt/NAS/Samis_folder/" >> ${HOME_DIR}/.bashrc
 
 # .bash_aliases
 cat << EOF >> ${HOME_DIR}/.bash_aliases
@@ -241,7 +239,6 @@ alias gitpullall='echo -e "\n\$PWD\n------------------------\n" && git status &&
 alias traceroute='sudo traceroute -I'
 alias fireth3cookie='(firefox -P th3cookie &> /dev/null &disown)'
 alias firework='(firefox -P Work &> /dev/null &disown)'
-alias ovpn='sudo openvpn --config ~/work/hostopia.ovpn &'
 alias ss='sudo ss'
 alias systemctl='sudo systemctl'
 alias copy='xclip -sel clip'
