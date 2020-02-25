@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
-# Usage -> MSGID="1j6N5S-00FFUk-8d"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh) $MSGID
+# Usage -> MSGID="1j6RzM-000bdu-NG"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh) $MSGID
 # Usage 2 -> MSGID="1itJK6-004Keg-O7"; wget https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh -O ~/chk_spam.sh && chmod +x ~/chk_spam.sh; ~/chk_spam.sh $MSGID
 
 MSGID="$1";
@@ -75,7 +75,7 @@ else
     POSTLOGS=$(grep POST /home/${USRNAME}/access-logs/* | awk '{print $7}' | sort -n | uniq -c | sort -n | tail -n 20)
     echo "$POSTLOGS" | while read line; do
         CT=$(echo $line | awk '{print $1}')
-        echo -e "${CT}\t -> ${DOMAIN}$(echo $line | awk '{print $2}')"
+        echo -e "${CT}\t->\t${DOMAIN}$(echo $line | awk '{print $2}')"
     done
     # Doing Joomla Checks
     echo "${SCRIPTSITES}" | while read line; do
