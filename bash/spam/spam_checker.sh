@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sami S - Hostopia AU 2019
-# Usage -> MSGID="1izlhQ-00ETrO-St"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh) $MSGID
+# Usage -> MSGID="1j6N5S-00FFUk-8d"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh) $MSGID
 # Usage 2 -> MSGID="1itJK6-004Keg-O7"; wget https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/spam_checker.sh -O ~/chk_spam.sh && chmod +x ~/chk_spam.sh; ~/chk_spam.sh $MSGID
 
 MSGID="$1";
@@ -60,7 +60,7 @@ if [[ -n ${DOVEMETHOD} ]]; then
         echo -e "Appears to be dovecot, the sending email is: ${EMAIL}"
         echo "Use this command to roll the password (only if you know it's compromised):"
         echo -e "/usr/local/cpanel/bin/uapi --user=${USRNAME} Email passwd_pop email=$(echo ${EMAIL} | awk -F '@' '{print $1}') password=$(openssl rand -base64 15) domain=$(echo ${EMAIL} | awk -F '@' '{print $2}')\n"
-        echo "Send this to au-servicedesk-alerts:"
+        echo "Send this to l1-newbies:"
         echo "Can someone please get in touch with '"${USRNAME}"' on '$(hostname)'"
         echo "Compromised email password has been rolled -> ${EMAIL}"
         if [[ ! $RESELLER =~ (dpresell|shared) ]]; then
@@ -91,7 +91,7 @@ RewriteRule .? - [R=403]
 RewriteCond %{QUERY_STRING} /?option=com_contact [NC]
 RewriteRule .? - [R=403]
 EOF
-            echo -e "\nSend this to au-servicedesk-alerts:"
+            echo -e "\nSend this to l1-newbies:"
             echo "Can someone get in touch with '"${HOMEDIR}"' on '$(hostname)'"
             echo "Compromised joomla form on website '$(grep "${HOMEDIR}" /etc/trueuserdomains | awk -F: '{print $1}')' blocked in htaccess"
             if [[ ! $RESELLER =~ (dpresell|shared) ]]; then
@@ -102,7 +102,7 @@ EOF
     done
     # echo -e "sample of script sending logs from the IP:\n$(grep ${MSGIP} /home/${USRNAME}/access-logs/* 2> /dev/null | tail)\n"
     if [[ ${HOMEDIR} != ${USRNAME} ]]; then
-        echo -e "\nSend this to au-servicedesk-alerts:"
+        echo -e "\nSend this to l1-newbies:"
         echo -e "Can someone get in touch with '"${USRNAME}"' on '$(hostname)'"
         echo -e "Compromised form on website '${DOMAIN}' is sending spam - blocked in htaccess"
         if [[ ! $RESELLER =~ (dpresell|shared) ]]; then
@@ -110,7 +110,6 @@ EOF
         fi
     fi
 fi
-
 echo -e "\nClear the exim queue with:"
 if [[ ! $(exim -bp | grep ${MSGID} | grep '<>') ]] && [[ -n ${EMAIL} ]]; then
     echo "exim -bp | awk '/${EMAIL}/{print \$3}' | xargs exim -Mrm"
