@@ -72,7 +72,11 @@ else
     SCRIPTSITES=$(grep cwd /var/log/exim_mainlog | grep -v /var/spool | awk -F"cwd=" '{print $2}' | grep -vP ^$ | awk '{print $1}' | sort | uniq -c | sort -n | grep -v '\/tmp\/\|\/usr\/local\|\/etc\/csf\|\/root\|\/$' | tail)
     echo -e "${SCRIPTSITES}\n"
     echo -e "Checking Username '${USRNAME}' for the most POST requests in apache logs (last 20).\nPlease investigate the below manually...\n"
-    echo -e "$(grep POST /home/${USRNAME}/access-logs/* | awk '{print $7}' | sort -n | uniq -c | sort -n | tail -n 20)\n"
+    POSTLOGS=$(grep POST /home/${USRNAME}/access-logs/* | awk '{print $7}' | sort -n | uniq -c | sort -n | tail -n 20)
+    echo "$POSTLOGS" | while read line; do
+        CT=$(echo $line | awk '{print $1}')
+        echo -e "${CT}\t -> ${DOMAIN}$(echo $line | awk '{print $2}')"
+    done
     # Doing Joomla Checks
     echo "${SCRIPTSITES}" | while read line; do
         HOMEDIR=$(echo "${line}" | awk -F '/' '{print $3}' | grep -v ^$)
