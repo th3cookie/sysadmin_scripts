@@ -75,7 +75,7 @@ else
     POSTLOGS=$(grep POST /home/${USRNAME}/access-logs/* | awk '{print $7}' | sort -n | uniq -c | sort -n | tail -n 20)
     echo "$POSTLOGS" | while read line; do
         CT=$(echo $line | awk '{print $1}')
-        echo -e "${CT}\t${DOMAIN}$(echo $line | awk '{print $2}')"
+        echo -e "${CT}\t->\t${DOMAIN}$(echo $line | awk '{print $2}')"
     done
     # Doing Joomla Checks
     echo "${SCRIPTSITES}" | while read line; do
