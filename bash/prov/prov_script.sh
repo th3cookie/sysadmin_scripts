@@ -88,7 +88,20 @@ fi
 ##################
 
 if [[ ${WORKPC} =~ [Yy] ]]; then
-    echo "work PC"
+    # .bash_aliases for work
+    cat << EOF >> ${HOME_DIR}/.bash_aliases
+function hosted() {
+	host $1 | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" | xargs host | awk '{print $5}' | bash -ic "xargs whm"
+}
+alias pulldev='ssh -tq puppet02 "bash -ic pulldev"'
+alias pullstaging='ssh -tq puppet02 "bash -ic pullstaging"'
+function sslchk() {
+        firefox https://www.sslshopper.com/ssl-checker.html#hostname=$1 &
+}
+function fixpup() {
+    echo "Doing puppet manifest checks - Lint and Parser..."; echo "If there is no output below, everything is fine."; echo "-------------------------------------------------"; puppet-lint $1; puppet parser validate $1;
+}
+EOF
 else
     # If not a work PC...
     # VPN to connect to work network -> https://sslvpn01.digitalpacific.com.au:942/?src=connect
