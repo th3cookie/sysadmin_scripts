@@ -107,6 +107,9 @@ else
     # VPN to connect to work network -> https://sslvpn01.digitalpacific.com.au:942/?src=connect
     cat << EOF >> ${HOME_DIR}/.bash_aliases
 alias ovpn='sudo openvpn --config ~/work/hostopia.ovpn &'
+alias sshdocker='ssh root@10.0.0.9'
+alias sshgoodboy='ssh root@10.0.0.7'
+alias sshnas='ssh -p 7022 admin@10.0.0.3'
 EOF
     # Downloading files from NAS
     mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1.0 //10.0.0.3/Samis_Folder /mnt/NAS/Samis_folder/
@@ -244,8 +247,8 @@ EOF
 cat << EOF >> ${HOME_DIR}/.bash_aliases
 alias hosts='sudo vim /etc/hosts'
 alias ssh='ssh -oStrictHostKeyChecking=no'
-alias crucial='ssh root@182.160.155.217'
-alias dpded='ssh ded.somethinglikesami.net -p 7022'
+alias sshcrucial='ssh root@182.160.155.217'
+alias sshdpded='ssh ded.somethinglikesami.net -p 7022'
 alias reslack='pkill slack && slack'
 alias gitpushall='echo -e "\n\$PWD\n------------------------\n" && git status && git add . && git commit -m "auto commit from \$(hostname)" && git push origin'
 alias gitpullall='echo -e "\n\$PWD\n------------------------\n" && git status && git pull'
