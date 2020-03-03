@@ -13,12 +13,31 @@ else
     REAL_USER=$(whoami)
 fi
 
+read -p "Is this the correct docker user on the system [Y/y]: ${REAL_USER}? " ACTION
+
+if [[ ! ${ACTION} =~ [Yy] ]]; then
+    echo -e "List of users on the system:\n"
+    awk -F: '{print $1}' /etc/passwd
+    echo ""
+    read -p "What user will be running the docker containers? " REAL_USER
+fi
+
 # Read user input and store in variables
 read -p 'Please set your computer hostname: ' PC_HOSTNAME
 hostnamectl set-hostname ${PC_HOSTNAME}
 
 # Comment the below if the user is different
 NAS_USER=admin
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+PUID=$(id -u ${REAL_USER})
+PGID=$(id -u ${REAL_USER})
+TZ="Australia/Sydney"
+USERDIR="/home/${REAL_USER}"
+MYSQL_ROOT_PASSWORD=$(date +%s | sha256sum | base64 | head -c 12 ; echo)
+echo "[client]" > ${USERDIR}/.my.cnf
+echo "user=root" >> ${USERDIR}/.my.cnf
+echo "password=${MYSQL_ROOT_PASSWORD}" >> ${USERDIR}/.my.cnf
+echo "Mysql root password stored in ${USERDIR}/.my.cnf"
 
 if [[ -z ${NAS_USER} ]]; then
     read -p 'NAS Username: ' NAS_USER
@@ -61,8 +80,9 @@ do
 done
 
 # Creating dir structure and properties
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-mkdir -p /mnt/NAS/Downloads /mnt/NAS/Video
+mkdir -p /mnt/NAS/Downloads /mnt/NAS/Video ${USERDIR}/docker
+sudo setfacl -Rdm g:docker:rwx ${USERDIR}/docker
+sudo chmod -R 775 ${USERDIR}/docker
 $INSTALL_COMMAND update
 $INSTALL_COMMAND upgrade
 $INSTALL_COMMAND install -y cifs-utils bash-completion vim curl wget telnet nfs-common apt-transport-https ca-certificates gnupg-agent software-properties-common
@@ -70,7 +90,9 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo apt-key fingerprint 0EBFCD88
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 $INSTALL_COMMAND install -y docker-ce
-usermod -a -G docker ${REAL_USER}
+usermod -aG docker ${REAL_USER}
+sudo curl -L "https://github.com/docker/compose/releases/download/1.25.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
 
 cat << EOF >> /etc/fstab
 
@@ -90,20 +112,20 @@ fi
 ### Setup bash environment ###
 ##############################
 
-if [[ $(grep bash_alias ${HOME_DIR}/.bashrc | wc -l) -lt 2 ]]
+if [[ $(grep bash_alias ${USERDIR}/.bashrc | wc -l) -lt 2 ]]
 then
-    cat << EOF >> ${HOME_DIR}/.bashrc
+    cat << EOF >> ${USERDIR}/.bashrc
 
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 EOF
-    touch ${HOME_DIR}/.bash_aliases
+    touch ${USERDIR}/.bash_aliases
 fi
 
 ##############
 ### Others ###
 ##############
 
-cp $SCRIPT_DIR/configs/.vimrc ${HOME_DIR}/
-
+cp $SCRIPT_DIR/configs/.vimrc ${USERDIR}/
+cp $SCRIPT_DIR/configs/docker-compose.yml ${USERDIR}/docker
