@@ -14,7 +14,7 @@ services:
     restart: always
     command: -H unix:///var/run/docker.sock
     ports:
-      - "XXXX:9000"
+      - "9000:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${USERDIR}/docker/portainer/data:/data
@@ -32,7 +32,7 @@ services:
       - ${USERDIR}/docker/organizr:/config
       - ${USERDIR}/docker/shared:/shared
     ports:
-      - "XXXX:80"
+      - "9001:80"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -47,7 +47,7 @@ services:
     links:
       - mariadb:db
     ports:
-      - XXXX:80
+      - 9002:80
     environment:
       - PMA_HOST=mariadb
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -81,7 +81,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ${USERDIR}/docker/shared:/shared
     ports:
-      - "XXXX:8123"
+      - "8123:8123"
     privileged: true
     environment:
       - PUID=${PUID}
@@ -101,7 +101,7 @@ services:
       - /dev/net/tun
     restart: always
     ports:
-    - "XXXX:9091"
+    - "9091:9091"
     dns:
       - 1.1.1.1
       - 1.0.0.1
@@ -113,10 +113,11 @@ services:
       - ${USERDIR}/Downloads/completed:/data/completed
       - ${USERDIR}/Downloads/incomplete:/data/incomplete
     environment:
-      - OPENVPN_PROVIDER=IPVANISH
-      - OPENVPN_USERNAME=ipvanish_username
-      - OPENVPN_PASSWORD=ipvanish_password
-      - OPENVPN_CONFIG="YYYYYYYYYYY" 
+      - OPENVPN_PROVIDER=${VPN_PROVIDER}
+      - OPENVPN_USERNAME=${VPN_USER}
+      - OPENVPN_PASSWORD=${VPN_PASS}
+      # This is optional. See here for more details -> https://haugene.github.io/docker-transmission-openvpn/run-from-docker-registry/
+      # - OPENVPN_CONFIG="YYYYYYYYYYY"
       - OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60
       - LOCAL_NETWORK=192.168.1.0/24
       - PUID=${PUID}
@@ -124,8 +125,8 @@ services:
       - TZ=${TZ}
       - TRANSMISSION_RPC_AUTHENTICATION_REQUIRED=true
       - TRANSMISSION_RPC_HOST_WHITELIST="127.0.0.1,192.168.*.*"
-      - TRANSMISSION_RPC_PASSWORD=${TRANSMISSION_RPC_PASSWORD}
-      - TRANSMISSION_RPC_USERNAME=${TRANSMISSION_RPC_USERNAME}
+      - TRANSMISSION_RPC_PASSWORD=${TRANSMISSION_PASS}
+      - TRANSMISSION_RPC_USERNAME=${TRANSMISSION_USER}
       - TRANSMISSION_UMASK=002
       - TRANSMISSION_RATIO_LIMIT=0.01
       - TRANSMISSION_RATIO_LIMIT_ENABLED=true
@@ -142,64 +143,6 @@ services:
       - TRANSMISSION_WATCH_DIR_ENABLED=true
       - TRANSMISSION_DOWNLOAD_DIR=/downloads/completed
 
-# qBittorrent without VPN – Bittorrent Downloader (Alternative)
-  qbittorrent:
-    image: "linuxserver/qbittorrent"
-    hostname: qbittorrent
-    container_name: "qbittorrent"
-    volumes:
-      - ${USERDIR}/docker/qbittorrent:/config
-      - ${USERDIR}/Downloads/completed:/downloads
-      - ${USERDIR}/docker/shared:/shared
-    ports:
-      - "XXXX:XXXX"
-      - "6881:6881"
-      - "6881:6881/udp"
-    restart: always
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - UMASK_SET=002
-      - WEBUI_PORT=XXXX
-
-# SABnzbd – Usenet (NZB) Downloader
-  sabnzbd:
-    image: "linuxserver/sabnzbd"
-    hostname: sabnzbd
-    container_name: "sabnzbd"
-    volumes:
-      - ${USERDIR}/docker/sabnzbd:/config
-      - ${USERDIR}/Downloads/completed:/downloads
-      - ${USERDIR}/Downloads/incomplete:/incomplete-downloads
-      - ${USERDIR}/docker/shared:/shared
-    ports:
-        - "XXXX:8080"
-    restart: always
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-
-# NZBGet – Usenet (NZB) Downloader (Alternative)
-  nzbget:
-    image: "linuxserver/nzbget"
-    hostname: nzbget
-    container_name: "nzbget"
-    volumes:
-      - ${USERDIR}/docker/sabnzbd:/config
-      - ${USERDIR}/Downloads:/downloads
-      - ${USERDIR}/Downloads/incomplete:/incomplete-downloads
-      - ${USERDIR}/docker/shared:/shared
-    ports:
-      - "XXXX:6789"
-    restart: always
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-
-
 ######### PERSONAL VIDEO RECORDERS ##########
 
 # Radarr – Movie Download and Management
@@ -214,30 +157,11 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
       - ${USERDIR}/docker/shared:/shared
     ports:
-      - "XXXX:7878"
+      - "7878:7878"
     restart: always
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=${TZ}
-
-# CouchPotato – Movie Download and Management (Alternative)
-  couchpotato:
-    image: "linuxserver/couchpotato"
-    hostname: couchpotato
-    container_name: "couchpotato"
-    volumes:
-      - ${USERDIR}/docker/couchpotato:/config
-      - ${USERDIR}/Downloads/completed:/downloads
-      - ${USERDIR}/media/movies:/movies
-      - ${USERDIR}/docker/shared:/shared
-    ports:
-      - "XXXX:5050"
-    restart: always
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - UMASK_SET=002
       - TZ=${TZ}
 
 # Sonarr – TV Show Download and Management
@@ -252,44 +176,7 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
       - ${USERDIR}/docker/shared:/shared
     ports:
-        - "XXXX:8989"
-    restart: always
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-
-#LIDARR - Music Download and Management
-  lidarr:
-    image: "linuxserver/lidarr"
-    hostname: lidarr
-    container_name: "lidarr"
-    volumes:
-      - ${USERDIR}/docker/lidarr:/config
-      - ${USERDIR}/Downloads:/downloads
-      - ${USERDIR}/media/music:/music
-      - "/etc/localtime:/etc/localtime:ro"
-      - ${USERDIR}/docker/shared:/shared
-    ports:
-      - "XXXX:8686"
-    restart: always
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      
-# SickRage – TV Show Download and Management (Alternative)
-  sickrage:
-    image: "linuxserver/sickrage"
-    hostname: sickrage
-    container_name: "sickrage"
-    volumes:
-      - ${USERDIR}/docker/sickrage:/config
-      - ${USERDIR}/Downloads/completed:/downloads
-      - ${USERDIR}/media/tvshows:/tv
-      - ${USERDIR}/docker/shared:/shared
-    ports:
-      - "XXXX:8081"
+        - "8989:8989"
     restart: always
     environment:
       - PUID=${PUID}
@@ -338,7 +225,7 @@ services:
       - ${USERDIR}/docker/tautulli/logs:/logs:ro
       - ${USERDIR}/docker/shared:/shared
     ports:
-      - "XXXX:8181"
+      - "8181:8181"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -354,30 +241,13 @@ services:
       - ${USERDIR}/docker/ombi:/config
       - ${USERDIR}/docker/shared:/shared
     ports:
-      - "XXXX:3579"
+      - "3579:3579"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
 
 ######### SEARCHERS ##########
-
-# NZBHydra – NZB Meta Search
-  hydra:
-    image: "linuxserver/hydra"
-    hostname: hydra
-    container_name: "hydra"
-    volumes:
-      - ${USERDIR}/docker/hydra:/config
-      - ${USERDIR}/Downloads:/downloads
-      - ${USERDIR}/docker/shared:/shared
-    ports:
-      - "XXXX:5075"
-    restart: always
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ} 
 
 # Jackett – Torrent Proxy
   jackett:
@@ -390,7 +260,7 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
       - ${USERDIR}/docker/shared:/shared
     ports:
-      - "XXXX:9117"
+      - "9117:9117"
     restart: always
     environment:
       - PUID=${PUID}
@@ -429,7 +299,7 @@ services:
       - ${USERDIR}/shared_data:/data
       - ${USERDIR}/docker/shared:/shared
     ports:
-      - "XXXX:443"
+      - "9005:443"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
