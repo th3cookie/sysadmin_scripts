@@ -155,12 +155,6 @@ cat << EOF | sudo tee -a /etc/fstab
 10.0.0.3:/volume1/Video ${USERDIR}/mount/Video nfs rsize=8192,wsize=8192,timeo=14,intr
 EOF
 
-sestatus | grep 'SELinux status' | grep -qi enabled
-if [[ ! $? -ge 1 ]]; then
-    setenforce 0
-    sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
-fi
-
 ##############################
 ### Setup bash environment ###
 ##############################
