@@ -116,15 +116,16 @@ services:
       - OPENVPN_PROVIDER=${VPN_PROVIDER}
       - OPENVPN_USERNAME=${VPN_USER}
       - OPENVPN_PASSWORD=${VPN_PASS}
-      # This is optional. See here for more details -> https://haugene.github.io/docker-transmission-openvpn/run-from-docker-registry/
+      # This next one is optional. See here for more details -> https://haugene.github.io/docker-transmission-openvpn/run-from-docker-registry/
       # - OPENVPN_CONFIG="YYYYYYYYYYY"
       - OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60
-      - LOCAL_NETWORK=192.168.1.0/24
+      - LOCAL_NETWORK=${LOCAL_SUBNET}
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
       - TRANSMISSION_RPC_AUTHENTICATION_REQUIRED=true
-      - TRANSMISSION_RPC_HOST_WHITELIST="127.0.0.1,192.168.*.*"
+      - TRANSMISSION_RPC_HOST_WHITELIST=${TRANSMISSION_WHITELIST}
+      - TRANSMISSION_RPC_WHITELIST_ENABLED=true
       - TRANSMISSION_RPC_PASSWORD=${TRANSMISSION_PASS}
       - TRANSMISSION_RPC_USERNAME=${TRANSMISSION_USER}
       - TRANSMISSION_UMASK=002
@@ -142,6 +143,7 @@ services:
       - TRANSMISSION_WATCH_DIR=/downloads
       - TRANSMISSION_WATCH_DIR_ENABLED=true
       - TRANSMISSION_DOWNLOAD_DIR=/downloads/completed
+      - TRANSMISSION_DOWNLOAD_QUEUE_SIZE=50
 
 ######### PERSONAL VIDEO RECORDERS ##########
 
@@ -287,19 +289,3 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-
-# NextCloud – Your Own Cloud Storage
-  nextcloud:
-    container_name: nextcloud
-    hostname: nextcloud
-    restart: always
-    image: linuxserver/nextcloud
-    volumes:
-      - ${USERDIR}/docker/nextcloud:/config
-      - ${USERDIR}/shared_data:/data
-      - ${USERDIR}/docker/shared:/shared
-    ports:
-      - "9005:443"
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}

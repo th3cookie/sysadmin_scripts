@@ -1,0 +1,17 @@
+# Jackett – Torrent Proxy
+jackett:
+  image: "linuxserver/jackett"
+  hostname: jackett
+  container_name: "jackett"
+  volumes:
+    - ${USERDIR}/docker/jackett:/config
+    - ${USERDIR}/Downloads/completed:/downloads
+    - "/etc/localtime:/etc/localtime:ro"
+    - ${USERDIR}/docker/shared:/shared
+  ports:
+    - "9117:9117"
+  restart: always
+  environment:
+    - PUID=${PUID}
+    - PGID=${PGID}
+    - TZ=${TZ}

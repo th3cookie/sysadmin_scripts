@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # If no sudo - quit
 if ! [ $(id -u) = 0 ]; then
    echo "The script need to be run as root." >&2
@@ -22,6 +21,37 @@ if [[ ! ${ACTION} =~ [Yy] ]]; then
     read -p "Which user will be running the docker containers? " REAL_USER
 fi
 
+# Getting things ready
+if [[ ! $(lsb_release -is | grep -i ubuntu) ]]
+then
+    echo "This script will only work on an ubuntu machine."
+    exit 1
+fi
+if [[ -x $(which apt) ]]; then
+    INSTALL_COMMAND=$(which apt)
+    echo -e "\nI have found your package manager '${INSTALL_COMMAND}'. Continuing...\n"
+elif [[ -x $(which apt-get) ]]; then
+    INSTALL_COMMAND=$(which apt-get)
+    echo -e "\nI have found your package manager '${INSTALL_COMMAND}'. Continuing...\n"
+else
+    echo -e "\nI could not find your package manager, something went wrong, exiting.\n"
+    exit 1
+fi
+
+# This is a menu creation function with an undefined amount of arguments passed to it.
+menu_from_array () {
+    select item; do
+        # Check the selected menu item number
+        if [ 1 -le "$REPLY" ] && [ "$REPLY" -le $# ]; then
+            echo "The selected item is $item"
+            SELECTED_ITEM=$item
+            break;
+        else
+            echo "Wrong selection: Select any number from 1-$#"
+        fi
+    done
+}
+
 # Read user input and store in variables
 read -p 'Please set your computer hostname: ' PC_HOSTNAME
 hostnamectl set-hostname ${PC_HOSTNAME}
@@ -36,28 +66,48 @@ read -p 'VPN Username: ' VPN_USER
 read -sp 'VPN Password: ' VPN_PASS
 read -p 'Transmission Username: ' TRANSMISSION_USER
 read -sp 'Transmission Password: ' TRANSMISSION_PASS
-
-# Getting things ready
-if [[ ! $(lsb_release -is | grep -i ubuntu) ]]
-then
-    echo "This script will only work on an ubuntu machine. Sorry."
-    exit 1
+# Comment the below if the user is different
+NAS_USER=admin
+if [[ -z ${NAS_USER} ]]; then
+    read -p 'NAS Username: ' NAS_USER
 fi
+read -sp 'NAS Password: ' NAS_PASS
 
-if [[ -x $(which apt) ]]; then
-    INSTALL_COMMAND=$(which apt)
-    echo -e "\nI have found your package manager '${INSTALL_COMMAND}'. Continuing...\n"
-elif [[ -x $(which apt-get) ]]; then
-    INSTALL_COMMAND=$(which apt-get)
-    echo -e "\nI have found your package manager '${INSTALL_COMMAND}'. Continuing...\n"
-else
-    echo -e "\nI could not find your package manager, something went wrong, exiting.\n"
-    exit 1
-fi
+# Setting up the menu of interface on the machine to allow the user to specify which interface to allow local traffic to transmission on.
+# Declare the array and add the interfaces to it
+INTERFACE_OPTIONS=()
+for i in $(ip a | grep -oP "(?<=\d: )(.*)(?=:)"); do
+    IP=$(ip -4 a show ${i} | grep -oP '(?<=inet\s)\d+(\.\d+){3}\/\d+')
+    INTERFACE_OPTIONS=( "${INTERFACE_OPTIONS[@]}" "${i} -> ${IP}" )
+done
+# Call the subroutine to create the menu
+echo -e "\nPlease specify the subnet which transmission will allow local connections to the webui from (i.e. which network should transmission allow to bypass the VPN tunnel interface inside the container)?"
+echo "This is generally the interface which has your devices private NAT IP from your router (e.g. 10.0.0.7 or 192.168.0.7 etc.)"
+echo "Unfortunately, this script will only work on /24 subnets. No logic has been done on any other subnet."
+menu_from_array "${INTERFACE_OPTIONS[@]}"
+# LOCAL_INTERFACE=$(echo "${SELECTED_ITEM}" | awk '{print $1}')
+LOCAL_SUBNET=$(echo "${SELECTED_ITEM}" | awk '{print $3}' | awk -F. '{print $1"."$2"."$3".0/24"}')
+TRANSMISSION_WHITELIST=$(echo "${LOCAL_SUBNET}" | awk -F. '{print "\"127.0.0.1,"$1"."$2"."$3".*\""}')
 
 $INSTALL_COMMAND update
 $INSTALL_COMMAND upgrade
-$INSTALL_COMMAND install -y cifs-utils bash-completion vim curl wget telnet nfs-common apt-transport-https ca-certificates software-properties-common jq
+$INSTALL_COMMAND install -y cifs-utils bash-completion vim curl wget telnet nfs-common apt-transport-https ca-certificates software-properties-common \
+jq python3.8 python3 python3-venv python3-pip
+# Determine Python version to parse yaml and add to MOTD. If no python, exit.
+PY_VERSION=$(which python3.8)
+if [[ -z ${PY_VERSION} ]]; then
+    PY_VERSION=$(which python3.6)
+fi
+if [[ -z ${PY_VERSION} ]]; then
+    PY_VERSION=$(which python3)
+fi
+if [[ -z ${PY_VERSION} ]]; then
+    echo "Could not find your python version from either '3.8', '3.6' or '3'. Please manually install one of these with \"${INSTALL_COMMAND} install -y python3\"."
+    echo "Exiting the script, please re-run it after installing python 3."
+    exit 1
+fi
+pip3 install -U pip
+pip3 install pyyaml
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 $INSTALL_COMMAND update
@@ -81,27 +131,23 @@ echo "VPN_USER=${VPN_USER}" | sudo tee -a /etc/environment
 echo "VPN_PASS=${VPN_PASS}" | sudo tee -a /etc/environment
 echo "TRANSMISSION_USER=${TRANSMISSION_USER}" | sudo tee -a /etc/environment
 echo "TRANSMISSION_PASS=${TRANSMISSION_PASS}" | sudo tee -a /etc/environment
+echo "LOCAL_SUBNET=${LOCAL_SUBNET}" | sudo tee -a /etc/environment
+echo "TRANSMISSION_WHITELIST=${TRANSMISSION_WHITELIST}" | sudo tee -a /etc/environment
+echo "TRANSMISSION_DOWNLOAD_LOCATION=${TRANSMISSION_DOWNLOAD_LOCATION}" | sudo tee -a /etc/environment
 
 # Creating dir structure and properties
 mkdir -p ${USERDIR}/mount/Downloads ${USERDIR}/mount/Video ${USERDIR}/docker
 sudo chmod -R 775 ${USERDIR}/docker
 sudo setfacl -Rdm g:docker:rwx ${USERDIR}/docker
+sudo setfacl -Rdm g:docker:rwx ${USERDIR}/mount
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-# Comment the below if the user is different
-NAS_USER=admin
-
-if [[ -z ${NAS_USER} ]]; then
-    read -p 'NAS Username: ' NAS_USER
-fi
-read -sp 'NAS Password: ' NAS_PASS
-
-cat << EOF >> /etc/fstab
+cat << EOF | sudo tee -a /etc/fstab
 
 # Custom ones
 
-10.0.0.3:/volume1/Downloads /mnt/NAS/Downloads nfs rsize=8192,wsize=8192,timeo=14,intr
-10.0.0.3:/volume1/Video /mnt/NAS/Video nfs rsize=8192,wsize=8192,timeo=14,intr
+10.0.0.3:/volume1/Downloads ${USERDIR}/mount/Downloads nfs rsize=8192,wsize=8192,timeo=14,intr
+10.0.0.3:/volume1/Video ${USERDIR}/mount/Video nfs rsize=8192,wsize=8192,timeo=14,intr
 EOF
 
 sestatus | grep 'SELinux status' | grep -qi enabled
@@ -130,3 +176,5 @@ fi
 ##############
 
 cp $SCRIPT_DIR/docker-compose.yml ${USERDIR}/docker
+chmod +x ./update-motd.py
+sudo ${PY_VERSION} ./update-motd.py
