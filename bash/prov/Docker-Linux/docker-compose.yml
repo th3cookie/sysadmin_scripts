@@ -156,7 +156,7 @@ services:
       - ${USERDIR}/docker/radarr:/config
       - ${USERDIR}/Downloads/completed:/downloads
       - ${USERDIR}/media/movies:/movies
-      - "/etc/localtime:/etc/localtime:ro"
+      - /etc/localtime:/etc/localtime:ro
       - ${USERDIR}/docker/shared:/shared
     ports:
       - "7878:7878"
@@ -175,7 +175,7 @@ services:
       - ${USERDIR}/docker/sonarr:/config
       - ${USERDIR}/Downloads/completed:/downloads
       - ${USERDIR}/media/tvshows:/tv
-      - "/etc/localtime:/etc/localtime:ro"
+      - /etc/localtime:/etc/localtime:ro
       - ${USERDIR}/docker/shared:/shared
     ports:
         - "8989:8989"
@@ -259,7 +259,7 @@ services:
     volumes:
       - ${USERDIR}/docker/jackett:/config
       - ${USERDIR}/Downloads/completed:/downloads
-      - "/etc/localtime:/etc/localtime:ro"
+      - /etc/localtime:/etc/localtime:ro
       - ${USERDIR}/docker/shared:/shared
     ports:
       - "9117:9117"

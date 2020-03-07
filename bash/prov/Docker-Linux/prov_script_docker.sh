@@ -92,7 +92,7 @@ TRANSMISSION_WHITELIST=$(echo "${LOCAL_SUBNET}" | awk -F. '{print "\"127.0.0.1,"
 $INSTALL_COMMAND update
 $INSTALL_COMMAND upgrade
 $INSTALL_COMMAND install -y cifs-utils bash-completion vim curl wget telnet nfs-common apt-transport-https ca-certificates software-properties-common \
-jq python3.8 python3 python3-venv python3-pip
+jq python3.8 python3 python3-venv python3-pip git
 # Determine Python version to parse yaml and add to MOTD. If no python, exit.
 PY_VERSION=$(which python3.8)
 if [[ -z ${PY_VERSION} ]]; then
@@ -176,5 +176,5 @@ fi
 ##############
 
 cp $SCRIPT_DIR/docker-compose.yml ${USERDIR}/docker
-chmod +x ./update-motd.py
-sudo ${PY_VERSION} ./update-motd.py
+chmod +x ./parse-yaml.py
+sudo ${PY_VERSION} ./parse-yaml.py
