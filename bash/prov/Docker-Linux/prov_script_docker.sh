@@ -66,6 +66,13 @@ read -p 'VPN Username: ' VPN_USER
 read -sp 'VPN Password: ' VPN_PASS
 read -p 'Transmission Username: ' TRANSMISSION_USER
 read -sp 'Transmission Password: ' TRANSMISSION_PASS
+read -p "Would you like your MariaDB root password generated automatically? Type anything else to set it manually: [Yy] " MYSQL_PW_SET
+if [[ ${MYSQL_PW_SET} =~ [Yy] ]]; then
+    MYSQL_ROOT_PASSWORD=$(date +%s | sha256sum | base64 | head -c 12)
+else
+    read -sp "Please enter your MariaDB password for the root user: " MYSQL_ROOT_PASSWORD
+fi
+
 # Comment the below if the user is different
 NAS_USER=admin
 if [[ -z ${NAS_USER} ]]; then
@@ -120,7 +127,6 @@ PUID=$(id -u ${REAL_USER})
 PGID=$(grep docker /etc/group | grep -oP "\d+")
 TZ="Australia/Sydney"
 USERDIR="/home/${REAL_USER}"
-MYSQL_ROOT_PASSWORD=$(date +%s | sha256sum | base64 | head -c 12)
 echo "PUID=${PUID}" | sudo tee -a /etc/environment
 echo "PGID=${PGID}" | sudo tee -a /etc/environment
 echo "TZ=${TZ}" | sudo tee -a /etc/environment
@@ -139,7 +145,6 @@ echo "TRANSMISSION_DOWNLOAD_LOCATION=${TRANSMISSION_DOWNLOAD_LOCATION}" | sudo t
 mkdir -p ${USERDIR}/mount/Downloads ${USERDIR}/mount/Video ${USERDIR}/docker
 sudo chmod -R 775 ${USERDIR}/docker
 sudo setfacl -Rdm g:docker:rwx ${USERDIR}/docker
-sudo setfacl -Rdm g:docker:rwx ${USERDIR}/mount
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 cat << EOF | sudo tee -a /etc/fstab
