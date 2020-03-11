@@ -57,7 +57,7 @@ read -p 'Please set your computer hostname: ' PC_HOSTNAME
 hostnamectl set-hostname ${PC_HOSTNAME}
 VPN_PROVIDER="NORDVPN"
 read -p "Is your VPN Provider still ${VPN_PROVIDER}? [Y/y]: " VPN_ANSWER
-if [[ ! ${VPN_ANSWER} =~ [Yy] ]]; then
+if [[ ! ${VPN_ANSWER} =~ ^[Yy]$ ]]; then
     echo "Please enter your VPN provider from this list: (ensure you input an item from the \"config value\" column)"
     echo "https://haugene.github.io/docker-transmission-openvpn/supported-providers/"
     read -p "Who is your VPN provider? " VPN_PROVIDER
@@ -67,13 +67,9 @@ read -sp 'VPN Password: ' VPN_PASS
 echo ''
 read -p 'Transmission Username: ' TRANSMISSION_USER
 read -sp 'Transmission Password: ' TRANSMISSION_PASS
-echo ''
-read -p "Would you like your MariaDB root password generated automatically? Type anything else to set it manually: [Yy] " MYSQL_PW_SET
-if [[ ${MYSQL_PW_SET} =~ [Yy] ]]; then
+read -p "Would you like your MariaDB root password generated automatically? Otherwise, type the MySQL password: [Yy|Password] " MYSQL_ROOT_PASSWORD
+if [[ ${MYSQL_ROOT_PASSWORD} =~ ^[Yy]$ ]]; then
     MYSQL_ROOT_PASSWORD=$(date +%s | sha256sum | base64 | head -c 12)
-else
-    read -sp "Please enter your MariaDB password for the root user: " MYSQL_ROOT_PASSWORD
-    echo ''
 fi
 
 # Comment the below if the user is different
@@ -105,7 +101,7 @@ SERVER_IP=$(echo "${SELECTED_ITEM}" | awk '{print $3}' | grep -oP '\d+(\.\d+){3}
 TRANSMISSION_WHITELIST=$(echo "${LOCAL_SUBNET}" | awk -F. '{print "\"127.0.0.1,"$1"."$2"."$3".*\""}')
 
 $INSTALL_COMMAND update
-$INSTALL_COMMAND upgrade
+$INSTALL_COMMAND upgrade -y
 $INSTALL_COMMAND install -y cifs-utils bash-completion vim curl wget telnet nfs-common apt-transport-https ca-certificates software-properties-common \
 jq python3.8 python3 python3-venv python3-pip git apache2-utils
 # Determine Python version to parse yaml and add to MOTD. If no python, exit.
@@ -122,8 +118,10 @@ if [[ -z ${PY_VERSION} ]]; then
     exit 1
 fi
 pip3 install -U pip
+sudo pip install -U pip
 pip3 install pyyaml
 pip3 install -U pyyaml
+${PY_VERSION} -m pip install -U pyyaml
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 $INSTALL_COMMAND update

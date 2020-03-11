@@ -187,17 +187,22 @@ services:
       OPENVPN_PROVIDER: ${VPN_PROVIDER}
       OPENVPN_USERNAME: ${VPN_USER}
       OPENVPN_PASSWORD: ${VPN_PASS}
+<<<<<<< HEAD
     # This next one is optional. See here for more details -> https://haugene.github.io/docker-transmission-openvpn/run-from-docker-registry/
     # - OPENVPN_CONFIG="YYYYYYYYYYY"      OPENVPN_OPTS: --inactive 3600 --ping 10 --ping-exit 60
+=======
+      # OPENVPN_CONFIG: "ipvanish-CH-Zurich-zrh-c07"
+      OPENVPN_OPTS: --inactive 3600 --ping 10 --ping-exit 60
+>>>>>>> e16876ec968b5066d789e9bd4631d46099bc7e15
       LOCAL_NETWORK: ${LOCAL_SUBNET}
       PUID: ${PUID}
       PGID: ${PGID}
       TZ: ${TZ}
       UMASK_SET: 002
       TRANSMISSION_RPC_AUTHENTICATION_REQUIRED: "true"
-      TRANSMISSION_RPC_HOST_WHITELIST: "127.0.0.1,$SERVER_IP"
-      TRANSMISSION_RPC_PASSWORD: ${TRANSMISSION_RPC_PASSWORD}
-      TRANSMISSION_RPC_USERNAME: ${TRANSMISSION_RPC_USERNAME}
+      TRANSMISSION_RPC_HOST_WHITELIST: "127.0.0.1,${LOCAL_SUBNET}"
+      TRANSMISSION_RPC_PASSWORD: ${TRANSMISSION_USER}
+      TRANSMISSION_RPC_USERNAME: ${TRANSMISSION_PASS}
       TRANSMISSION_UMASK: 002
       TRANSMISSION_RATIO_LIMIT: 0.01
       TRANSMISSION_RATIO_LIMIT_ENABLED: "true"
