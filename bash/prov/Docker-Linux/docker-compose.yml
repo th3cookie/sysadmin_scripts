@@ -259,10 +259,10 @@ services:
       - ${USERDIR}/Downloads:/downloads
       - ${USERDIR}/mount/Video/Movies:/movies
       - "/etc/localtime:/etc/localtime:ro"
-      environment:
-        PUID: ${PUID}
-        PGID: ${PGID}
-        TZ: ${TZ}
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
   
   # Sonarr - TV Shows management
   # Set url_base in sonarr settings if using PathPrefix
