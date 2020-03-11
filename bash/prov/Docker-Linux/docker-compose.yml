@@ -37,7 +37,7 @@ services:
       - ${USERDIR}/docker/organizr:/config
       - ${USERDIR}/docker/shared:/shared
     ports:
-      - ${ORGANIZER_PORT}:80
+      - ${ORGANIZR_PORT}:80
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -275,7 +275,7 @@ services:
     networks:
       - default
     ports:
-      - ${SONARR_PORT}:8989v
+      - ${SONARR_PORT}:8989
     volumes:
       - ${USERDIR}/docker/sonarr:/config
       - ${USERDIR}/Downloads:/downloads

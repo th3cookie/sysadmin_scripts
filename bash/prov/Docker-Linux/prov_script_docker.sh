@@ -145,7 +145,7 @@ USERDIR="/home/${REAL_USER}"
 # Static Variables
 ##### PORTS
 PORTAINER_PORT=9000
-ORGANIZER_PORT=9001
+ORGANIZR_PORT=9001
 PHPMYADMIN_PORT=8000
 INFLUXDB_PORT=8086
 JACKETT_PORT=9117
@@ -207,7 +207,7 @@ echo "PLEX_WEB_TOOLS_PORT=${PLEX_WEB_TOOLS_PORT}" | sudo tee -a /etc/environment
 echo "BAZARR_PORT=${BAZARR_PORT}" | sudo tee -a /etc/environment
 echo "TAUTULLI_PORT=${TAUTULLI_PORT}" | sudo tee -a /etc/environment
 echo "PORTAINER_PORT=${PORTAINER_PORT}" | sudo tee -a /etc/environment
-echo "ORGANIZER_PORT=${ORGANIZER_PORT}" | sudo tee -a /etc/environment
+echo "ORGANIZR_PORT=${ORGANIZR_PORT}" | sudo tee -a /etc/environment
 
 # Creating dir structure and properties
 mkdir -p ${USERDIR}/mount/Downloads ${USERDIR}/mount/Video ${USERDIR}/docker
