@@ -64,13 +64,16 @@ if [[ ! ${VPN_ANSWER} =~ [Yy] ]]; then
 fi
 read -p 'VPN Username: ' VPN_USER
 read -sp 'VPN Password: ' VPN_PASS
+echo ''
 read -p 'Transmission Username: ' TRANSMISSION_USER
 read -sp 'Transmission Password: ' TRANSMISSION_PASS
+echo ''
 read -p "Would you like your MariaDB root password generated automatically? Type anything else to set it manually: [Yy] " MYSQL_PW_SET
 if [[ ${MYSQL_PW_SET} =~ [Yy] ]]; then
     MYSQL_ROOT_PASSWORD=$(date +%s | sha256sum | base64 | head -c 12)
 else
     read -sp "Please enter your MariaDB password for the root user: " MYSQL_ROOT_PASSWORD
+    echo ''
 fi
 
 # Comment the below if the user is different
@@ -79,6 +82,10 @@ if [[ -z ${NAS_USER} ]]; then
     read -p 'NAS Username: ' NAS_USER
 fi
 read -sp 'NAS Password: ' NAS_PASS
+echo ''
+read -p 'Varken Username? ' VARKEN_USER
+read -sp 'Varken Password: ' VARKEN_PASS
+echo ''
 
 # Setting up the menu of interface on the machine to allow the user to specify which interface to allow local traffic to transmission on.
 # Declare the array and add the interfaces to it
@@ -94,6 +101,7 @@ echo "Unfortunately, this script will only work on /24 subnets. No logic has bee
 menu_from_array "${INTERFACE_OPTIONS[@]}"
 # LOCAL_INTERFACE=$(echo "${SELECTED_ITEM}" | awk '{print $1}')
 LOCAL_SUBNET=$(echo "${SELECTED_ITEM}" | awk '{print $3}' | awk -F. '{print $1"."$2"."$3".0/24"}')
+SERVER_IP=$(echo "${SELECTED_ITEM}" | awk '{print $3}' | grep -oP '\d+(\.\d+){3}')
 TRANSMISSION_WHITELIST=$(echo "${LOCAL_SUBNET}" | awk -F. '{print "\"127.0.0.1,"$1"."$2"."$3".*\""}')
 
 $INSTALL_COMMAND update
@@ -128,6 +136,31 @@ PUID=$(id -u ${REAL_USER})
 PGID=$(grep docker /etc/group | grep -oP "\d+")
 TZ="Australia/Sydney"
 USERDIR="/home/${REAL_USER}"
+
+# Static Variables
+##### PORTS
+
+ORGANIZER_PORT=
+PHPMYADMIN_PORT=
+INFLUXDB_PORT=
+JACKETT_PORT=
+LIDARR_PORT=
+#If you change radarr and sonarr port then update plex meta agent
+RADARR_PORT=
+SONARR_PORT=
+JDOWNLOADER_PORT=
+TRANSMISSION_PORT=
+PLEX_PORT=
+PLEX_WEB_TOOLS_PORT=
+EMBY_PORT=
+BAZARR_PORT=
+TAUTULLI_PORT=
+APCUPSD_PORT=
+GUACAMOLE_PORT=
+IPVANISH_REMOTE_SERVER=
+IPVANISH_PROXY_PORT=
+JDOWNLOADER_PORT=
+
 echo "PUID=${PUID}" | sudo tee -a /etc/environment
 echo "PGID=${PGID}" | sudo tee -a /etc/environment
 echo "TZ=${TZ}" | sudo tee -a /etc/environment
@@ -141,6 +174,13 @@ echo "TRANSMISSION_PASS=${TRANSMISSION_PASS}" | sudo tee -a /etc/environment
 echo "LOCAL_SUBNET=${LOCAL_SUBNET}" | sudo tee -a /etc/environment
 echo "TRANSMISSION_WHITELIST=${TRANSMISSION_WHITELIST}" | sudo tee -a /etc/environment
 echo "TRANSMISSION_DOWNLOAD_LOCATION=${TRANSMISSION_DOWNLOAD_LOCATION}" | sudo tee -a /etc/environment
+echo "SERVER_IP=${SERVER_IP}" | sudo tee -a /etc/environment
+echo "VARKEN_USER=${VARKEN_USER}" | sudo tee -a /etc/environment
+echo "VARKEN_PASS=${VARKEN_PASS}" | sudo tee -a /etc/environment
+echo "TRANSMISSION_DOWNLOAD_LOCATION=${TRANSMISSION_DOWNLOAD_LOCATION}" | sudo tee -a /etc/environment
+echo "TRANSMISSION_DOWNLOAD_LOCATION=${TRANSMISSION_DOWNLOAD_LOCATION}" | sudo tee -a /etc/environment
+echo "TRANSMISSION_DOWNLOAD_LOCATION=${TRANSMISSION_DOWNLOAD_LOCATION}" | sudo tee -a /etc/environment
+
 
 # Creating dir structure and properties
 mkdir -p ${USERDIR}/mount/Downloads ${USERDIR}/mount/Video ${USERDIR}/docker
