@@ -21,25 +21,13 @@ with open(docker_file) as f:
     data = yaml.load(f, Loader=yaml.FullLoader)
 
 for service in data['services']:
-    if service == 'mariadb':
-        ports = data['services'][service]['ports'][0]['target']
-        new_ports_dict[service] = str(ports)
+    try:
+        ports = data['services'][service]['ports'][0]
+        new_ports_dict[service] = ports
         volumes = data['services'][service]['volumes']
         listVols(volumes)
-    else:
-        try:
-            ports = data['services'][service]['ports'][0]
-            new_ports_dict[service] = ports
-            volumes = data['services'][service]['volumes']
-            listVols(volumes)
-        except KeyError:
-            pass
-
-full_motd = "Installed docker services and their respective ports:\n"
-
-for key in new_ports_dict:
-    val = new_ports_dict[key]
-    full_motd += f"{key} -> {new_ports_dict[key].split(':')[0] if ':' in new_ports_dict[key] else val}\n"
+    except KeyError:
+        pass
 
 for vol in vols_to_create:
     if not os.path.exists(vol):
@@ -48,6 +36,3 @@ for vol in vols_to_create:
             print(f"Volume '{vol}' created successfully...")
         except OSError:
             print(f"Creation of the directory '{vol}' FAILED... Please check to see why it has failed, and remediate manually.")
-
-with open("/etc/motd", "a+") as f:
-    f.write(full_motd)
