@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.8
 # This script will parse the docker compose and print the services/ports to the MOTD. It will create this file if it doesn't exist as well.
 
 import yaml
 import os
+
+print(yaml.__version__)
 
 new_ports_dict = {}
 vols_to_create = []

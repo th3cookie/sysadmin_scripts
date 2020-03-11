@@ -97,7 +97,7 @@ LOCAL_SUBNET=$(echo "${SELECTED_ITEM}" | awk '{print $3}' | awk -F. '{print $1".
 TRANSMISSION_WHITELIST=$(echo "${LOCAL_SUBNET}" | awk -F. '{print "\"127.0.0.1,"$1"."$2"."$3".*\""}')
 
 $INSTALL_COMMAND update
-$INSTALL_COMMAND upgrade
+$INSTALL_COMMAND upgrade -y
 $INSTALL_COMMAND install -y cifs-utils bash-completion vim curl wget telnet nfs-common apt-transport-https ca-certificates software-properties-common \
 jq python3.8 python3 python3-venv python3-pip git apache2-utils
 # Determine Python version to parse yaml and add to MOTD. If no python, exit.
@@ -114,8 +114,10 @@ if [[ -z ${PY_VERSION} ]]; then
     exit 1
 fi
 pip3 install -U pip
+sudo pip install -U pip
 pip3 install pyyaml
 pip3 install -U pyyaml
+${PY_VERSION} -m pip install -U pyyaml
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 $INSTALL_COMMAND update
