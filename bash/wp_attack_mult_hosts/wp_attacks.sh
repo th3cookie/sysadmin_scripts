@@ -1,5 +1,4 @@
 #!/bin/bash
-# Sami S - Hostopia AU
 # Usage: Checks for IP addresses that are mostly causing load due to wp-loign or xmlrpc attacks. Blocks them on the hosts specified.
 # Login to vc01 -> Click on a cluster that is having load issues -> VMs -> Sort by Host CPU.
 # Click "Export" at the bottom and export the 'Name' and Host CPU rows to a CSV file.
