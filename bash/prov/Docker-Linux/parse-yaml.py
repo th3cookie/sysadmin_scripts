@@ -4,7 +4,6 @@
 import yaml
 import os
 
-new_ports_dict = {}
 vols_to_create = []
 docker_file = 'docker-compose.yml'
 
@@ -22,8 +21,6 @@ with open(docker_file) as f:
 
 for service in data['services']:
     try:
-        ports = data['services'][service]['ports'][0]
-        new_ports_dict[service] = ports
         volumes = data['services'][service]['volumes']
         listVols(volumes)
     except KeyError:
