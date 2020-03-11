@@ -4,8 +4,6 @@
 import yaml
 import os
 
-print(yaml.__version__)
-
 new_ports_dict = {}
 vols_to_create = []
 docker_file = 'docker-compose.yml'
