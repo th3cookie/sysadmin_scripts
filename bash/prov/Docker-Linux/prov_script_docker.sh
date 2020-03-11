@@ -177,15 +177,23 @@ echo "VARKEN_USER=${VARKEN_USER}" | sudo tee -a /etc/environment
 echo "VARKEN_PASS=${VARKEN_PASS}" | sudo tee -a /etc/environment
 if [[ -n ${TAUTULLI_API_KEY} ]]; then
     echo "TAUTULLI_API_KEY=${TAUTULLI_API_KEY}" | sudo tee -a /etc/environment
+else
+    echo "TAUTULLI_API_KEY=" | sudo tee -a /etc/environment
 fi
 if [[ -n ${SONARR_API_KEY} ]]; then
     echo "SONARR_API_KEY=${SONARR_API_KEY}" | sudo tee -a /etc/environment
+else
+    echo "SONARR_API_KEY=" | sudo tee -a /etc/environment
 fi
 if [[ -n ${RADARR_API_KEY} ]]; then
     echo "RADARR_API_KEY=${RADARR_API_KEY}" | sudo tee -a /etc/environment
+else
+    echo "RADARR_API_KEY=" | sudo tee -a /etc/environment
 fi
 if [[ -n ${PLEX_CLAIM} ]]; then
     echo "PLEX_CLAIM=${PLEX_CLAIM}" | sudo tee -a /etc/environment
+else
+    echo "PLEX_CLAIM=" | sudo tee -a /etc/environment
 fi
 echo "PHPMYADMIN_PORT=${PHPMYADMIN_PORT}" | sudo tee -a /etc/environment
 echo "INFLUXDB_PORT=${INFLUXDB_PORT}" | sudo tee -a /etc/environment
@@ -198,6 +206,8 @@ echo "PLEX_PORT=${PLEX_PORT}" | sudo tee -a /etc/environment
 echo "PLEX_WEB_TOOLS_PORT=${PLEX_WEB_TOOLS_PORT}" | sudo tee -a /etc/environment
 echo "BAZARR_PORT=${BAZARR_PORT}" | sudo tee -a /etc/environment
 echo "TAUTULLI_PORT=${TAUTULLI_PORT}" | sudo tee -a /etc/environment
+echo "PORTAINER_PORT=${PORTAINER_PORT}" | sudo tee -a /etc/environment
+echo "ORGANIZER_PORT=${ORGANIZER_PORT}" | sudo tee -a /etc/environment
 
 # Creating dir structure and properties
 mkdir -p ${USERDIR}/mount/Downloads ${USERDIR}/mount/Video ${USERDIR}/docker
