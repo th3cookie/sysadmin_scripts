@@ -14,7 +14,7 @@ fi
 
 read -p "Is this the correct docker user on the system: ${REAL_USER}? [Y/y] " ACTION
 
-if [[ ! ${ACTION} =~ [Yy] ]]; then
+if [[ ! ${ACTION} =~ ^[Yy]$ ]]; then
     echo -e "List of users on the system:\n"
     awk -F: '{print $1}' /etc/passwd
     echo ""
@@ -53,8 +53,10 @@ menu_from_array () {
 }
 
 # Read user input and store in variables
-read -p 'Please set your computer hostname: ' PC_HOSTNAME
-hostnamectl set-hostname ${PC_HOSTNAME}
+read -p 'Please set your computer hostname (Leave empty to skip): ' PC_HOSTNAME
+if [[ -n ${PC_HOSTNAME} ]]; then
+    hostnamectl set-hostname ${PC_HOSTNAME}
+fi
 VPN_PROVIDER="NORDVPN"
 read -p "Is your VPN Provider still ${VPN_PROVIDER}? [Y/y]: " VPN_ANSWER
 if [[ ! ${VPN_ANSWER} =~ ^[Yy]$ ]]; then
@@ -67,6 +69,7 @@ read -sp 'VPN Password: ' VPN_PASS
 echo ''
 read -p 'Transmission Username: ' TRANSMISSION_USER
 read -sp 'Transmission Password: ' TRANSMISSION_PASS
+echo ''
 read -p "Would you like your MariaDB root password generated automatically? Otherwise, type the MySQL password: [Yy|Password] " MYSQL_ROOT_PASSWORD
 if [[ ${MYSQL_ROOT_PASSWORD} =~ ^[Yy]$ ]]; then
     MYSQL_ROOT_PASSWORD=$(date +%s | sha256sum | base64 | head -c 12)
@@ -82,6 +85,10 @@ echo ''
 read -p 'Varken Username? ' VARKEN_USER
 read -sp 'Varken Password: ' VARKEN_PASS
 echo ''
+read -p 'Tautulli API Key (Leave blank if unsure, manually add it later to "/etc/environment" file): ' TAUTULLI_API_KEY
+read -p 'Sonarr API Key (Leave blank if unsure, manually add it later to "/etc/environment" file): ' SONARR_API_KEY
+read -p 'Radarr API Key (Leave blank if unsure, manually add it later to "/etc/environment" file): ' RADARR_API_KEY
+read -p 'Plex Claim Token (Grab it from here - https://www.plex.tv/claim/ - otherwise leave blank if unsure): ' PLEX_CLAIM
 
 # Setting up the menu of interface on the machine to allow the user to specify which interface to allow local traffic to transmission on.
 # Declare the array and add the interfaces to it
@@ -137,27 +144,20 @@ USERDIR="/home/${REAL_USER}"
 
 # Static Variables
 ##### PORTS
-
-ORGANIZER_PORT=
-PHPMYADMIN_PORT=
-INFLUXDB_PORT=
-JACKETT_PORT=
-LIDARR_PORT=
+PORTAINER_PORT=9000
+ORGANIZER_PORT=9001
+PHPMYADMIN_PORT=8000
+INFLUXDB_PORT=8086
+JACKETT_PORT=9117
 #If you change radarr and sonarr port then update plex meta agent
-RADARR_PORT=
-SONARR_PORT=
-JDOWNLOADER_PORT=
-TRANSMISSION_PORT=
-PLEX_PORT=
-PLEX_WEB_TOOLS_PORT=
-EMBY_PORT=
-BAZARR_PORT=
-TAUTULLI_PORT=
-APCUPSD_PORT=
-GUACAMOLE_PORT=
-IPVANISH_REMOTE_SERVER=
-IPVANISH_PROXY_PORT=
-JDOWNLOADER_PORT=
+RADARR_PORT=7878
+SONARR_PORT=8989
+GRAFANA_PORT=3000
+TRANSMISSION_PORT=9091
+PLEX_PORT=32400
+PLEX_WEB_TOOLS_PORT=33400
+BAZARR_PORT=6767
+TAUTULLI_PORT=8181
 
 echo "PUID=${PUID}" | sudo tee -a /etc/environment
 echo "PGID=${PGID}" | sudo tee -a /etc/environment
@@ -175,10 +175,29 @@ echo "TRANSMISSION_DOWNLOAD_LOCATION=${TRANSMISSION_DOWNLOAD_LOCATION}" | sudo t
 echo "SERVER_IP=${SERVER_IP}" | sudo tee -a /etc/environment
 echo "VARKEN_USER=${VARKEN_USER}" | sudo tee -a /etc/environment
 echo "VARKEN_PASS=${VARKEN_PASS}" | sudo tee -a /etc/environment
-echo "TRANSMISSION_DOWNLOAD_LOCATION=${TRANSMISSION_DOWNLOAD_LOCATION}" | sudo tee -a /etc/environment
-echo "TRANSMISSION_DOWNLOAD_LOCATION=${TRANSMISSION_DOWNLOAD_LOCATION}" | sudo tee -a /etc/environment
-echo "TRANSMISSION_DOWNLOAD_LOCATION=${TRANSMISSION_DOWNLOAD_LOCATION}" | sudo tee -a /etc/environment
-
+if [[ -n ${TAUTULLI_API_KEY} ]]; then
+    echo "TAUTULLI_API_KEY=${TAUTULLI_API_KEY}" | sudo tee -a /etc/environment
+fi
+if [[ -n ${SONARR_API_KEY} ]]; then
+    echo "SONARR_API_KEY=${SONARR_API_KEY}" | sudo tee -a /etc/environment
+fi
+if [[ -n ${RADARR_API_KEY} ]]; then
+    echo "RADARR_API_KEY=${RADARR_API_KEY}" | sudo tee -a /etc/environment
+fi
+if [[ -n ${PLEX_CLAIM} ]]; then
+    echo "PLEX_CLAIM=${PLEX_CLAIM}" | sudo tee -a /etc/environment
+fi
+echo "PHPMYADMIN_PORT=${PHPMYADMIN_PORT}" | sudo tee -a /etc/environment
+echo "INFLUXDB_PORT=${INFLUXDB_PORT}" | sudo tee -a /etc/environment
+echo "JACKETT_PORT=${JACKETT_PORT}" | sudo tee -a /etc/environment
+echo "RADARR_PORT=${RADARR_PORT}" | sudo tee -a /etc/environment
+echo "SONARR_PORT=${SONARR_PORT}" | sudo tee -a /etc/environment
+echo "GRAFANA_PORT=${GRAFANA_PORT}" | sudo tee -a /etc/environment
+echo "TRANSMISSION_PORT=${TRANSMISSION_PORT}" | sudo tee -a /etc/environment
+echo "PLEX_PORT=${PLEX_PORT}" | sudo tee -a /etc/environment
+echo "PLEX_WEB_TOOLS_PORT=${PLEX_WEB_TOOLS_PORT}" | sudo tee -a /etc/environment
+echo "BAZARR_PORT=${BAZARR_PORT}" | sudo tee -a /etc/environment
+echo "TAUTULLI_PORT=${TAUTULLI_PORT}" | sudo tee -a /etc/environment
 
 # Creating dir structure and properties
 mkdir -p ${USERDIR}/mount/Downloads ${USERDIR}/mount/Video ${USERDIR}/docker
