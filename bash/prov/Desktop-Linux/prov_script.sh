@@ -118,8 +118,8 @@ EOF
     else
         cp /mnt/NAS/Samis_folder/ops/hostopia.ovpn ${HOME_DIR}/work
         cp /mnt/NAS/Samis_folder/ops/ssh_keys/sami-openssh-private-key.ppk ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk
-        chmod 600 ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk ${HOME_DIR}/.ssh/SShakir-openssh-private-key
         cp /mnt/NAS/Samis_folder/ops/ssh_keys/Work/SShakir-openssh-private-key ${HOME_DIR}/.ssh/SShakir-openssh-private-key
+        chmod 600 ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk ${HOME_DIR}/.ssh/SShakir-openssh-private-key
         cp /mnt/NAS/Samis_folder/ops/prov_apps/* ${HOME_DIR}/Downloads/
     fi
     echo -e 'Downloading tor. It then needs to be extracted and placed in a $PATH directory to be able to start.'
@@ -273,9 +273,10 @@ cd ${HOME_DIR}/Downloads/
 sudo dnf localinstall slack-* code-*
 
 cp $SCRIPT_DIR/configs/.vimrc ${HOME_DIR}/
+cp $SCRIPT_DIR/configs/ssh_config ${HOME_DIR}/.ssh/config
+chmod 600 ${HOME_DIR}/.ssh/config
 
 # Configuring Snapd
-systemctl start snapd.service
 systemctl start snapd.service
 
 # Installing spotify
