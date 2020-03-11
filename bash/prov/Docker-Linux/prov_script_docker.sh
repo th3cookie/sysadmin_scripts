@@ -57,7 +57,7 @@ read -p 'Please set your computer hostname: ' PC_HOSTNAME
 hostnamectl set-hostname ${PC_HOSTNAME}
 VPN_PROVIDER="NORDVPN"
 read -p "Is your VPN Provider still ${VPN_PROVIDER}? [Y/y]: " VPN_ANSWER
-if [[ ! ${VPN_ANSWER} =~ [Yy] ]]; then
+if [[ ! ${VPN_ANSWER} =~ ^[Yy]$ ]]; then
     echo "Please enter your VPN provider from this list: (ensure you input an item from the \"config value\" column)"
     echo "https://haugene.github.io/docker-transmission-openvpn/supported-providers/"
     read -p "Who is your VPN provider? " VPN_PROVIDER
@@ -66,11 +66,9 @@ read -p 'VPN Username: ' VPN_USER
 read -sp 'VPN Password: ' VPN_PASS
 read -p 'Transmission Username: ' TRANSMISSION_USER
 read -sp 'Transmission Password: ' TRANSMISSION_PASS
-read -p "Would you like your MariaDB root password generated automatically? Type anything else to set it manually: [Yy] " MYSQL_PW_SET
-if [[ ${MYSQL_PW_SET} =~ [Yy] ]]; then
+read -p "Would you like your MariaDB root password generated automatically? Otherwise, type the MySQL password: [Yy|Password] " MYSQL_ROOT_PASSWORD
+if [[ ${MYSQL_ROOT_PASSWORD} =~ ^[Yy]$ ]]; then
     MYSQL_ROOT_PASSWORD=$(date +%s | sha256sum | base64 | head -c 12)
-else
-    read -sp "Please enter your MariaDB password for the root user: " MYSQL_ROOT_PASSWORD
 fi
 
 # Comment the below if the user is different
