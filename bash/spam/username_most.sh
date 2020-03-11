@@ -1,5 +1,4 @@
 #!/bin/bash
-# Sami S - Hostopia AU 2019
 # Usage -> bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/spam/username_most.sh)
 # Currently not working yet. Have to iron it out.
 
