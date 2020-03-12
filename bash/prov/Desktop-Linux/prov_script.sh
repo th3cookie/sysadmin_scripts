@@ -157,7 +157,11 @@ fi
 
 if [[ $INSTALL_COMMAND =~ (dnf|yum) ]]; then
     # Do installs
-    $INSTALL_COMMAND -y install httpd php php-cli php-php-gettext php-mbstring php-mcrypt php-mysqlnd php-pear php-curl php-gd php-xml php-bcmath php-zip mariadb-server
+    sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+    sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
+    sudo $INSTALL_COMMAND check-update
+    $INSTALL_COMMAND -y install httpd php php-cli php-php-gettext php-mbstring php-mcrypt php-mysqlnd php-pear php-curl php-gd php-xml php-bcmath php-zip \
+    mariadb-server code
     $INSTALL_COMMAND -y groupinstall "Development tools" && $INSTALL_COMMAND -y install php-devel autoconf automake
 
     # Configure Apache
@@ -270,7 +274,7 @@ EOF
 
 # Installing local rpm's
 cd ${HOME_DIR}/Downloads/
-sudo dnf localinstall slack-* code-*
+sudo dnf localinstall slack-*
 
 cp $SCRIPT_DIR/configs/.vimrc ${HOME_DIR}/
 cp $SCRIPT_DIR/configs/ssh_config ${HOME_DIR}/.ssh/config
