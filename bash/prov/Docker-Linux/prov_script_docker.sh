@@ -171,7 +171,6 @@ echo "TRANSMISSION_USER=${TRANSMISSION_USER}" | sudo tee -a /etc/environment
 echo "TRANSMISSION_PASS=${TRANSMISSION_PASS}" | sudo tee -a /etc/environment
 echo "LOCAL_SUBNET=${LOCAL_SUBNET}" | sudo tee -a /etc/environment
 echo "TRANSMISSION_WHITELIST=${TRANSMISSION_WHITELIST}" | sudo tee -a /etc/environment
-echo "TRANSMISSION_DOWNLOAD_LOCATION=${TRANSMISSION_DOWNLOAD_LOCATION}" | sudo tee -a /etc/environment
 echo "SERVER_IP=${SERVER_IP}" | sudo tee -a /etc/environment
 echo "VARKEN_USER=${VARKEN_USER}" | sudo tee -a /etc/environment
 echo "VARKEN_PASS=${VARKEN_PASS}" | sudo tee -a /etc/environment
