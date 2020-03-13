@@ -226,10 +226,12 @@ services:
       TZ: ${TZ}
       UMASK_SET: 002
       TRANSMISSION_RPC_AUTHENTICATION_REQUIRED: "true"
+      TRANSMISSION_RPC_HOST_WHITELIST_ENABLED: "true"
       TRANSMISSION_RPC_HOST_WHITELIST: "127.0.0.1,${LOCAL_SUBNET}"
       TRANSMISSION_RPC_WHITELIST_ENABLED: "true"
-      TRANSMISSION_RPC_PASSWORD: ${TRANSMISSION_USER}
-      TRANSMISSION_RPC_USERNAME: ${TRANSMISSION_PASS}
+      TRANSMISSION_RPC_WHITELIST: "127.0.0.1,${LOCAL_SUBNET}"
+      TRANSMISSION_RPC_PASSWORD: ${TRANSMISSION_PASS}
+      TRANSMISSION_RPC_USERNAME: ${TRANSMISSION_USER}
       TRANSMISSION_UMASK: 002
       TRANSMISSION_RATIO_LIMIT: 0.01
       TRANSMISSION_RATIO_LIMIT_ENABLED: "true"
@@ -297,6 +299,14 @@ services:
 ############################# MEDIA
 
   # Plex - Media Server
+  # Docker Run command:
+  # docker run -d --name plexms -h plexms --restart unless-stopped \
+  # -p 32400:32400/tcp -p 3005:3005/tcp -p 3005:3005/tcp -p 8324:8324/tcp -p 32469:32469/tcp \
+  # -p 1900:1900/udp -p 32410:32410/udp -p 32412:32412/udp -p 32413:32413/udp -p 32414:32414/udp \
+  # -p 33400:33400 -v ${USERDIR}/docker/plexms:/config -v ${USERDIR}/mount/Video:/data \
+  # -v /dev/shm:/transcode -v ${USERDIR}/docker/shared:/shared -e TZ=${TZ} -e HOSTNAME="nucPlex" \
+  # -e PLEX_CLAIM=${PLEX_CLAIM} -e PLEX_UID=${PUID} -e PLEX_GID=${PGID} \
+  # -e ADVERTISE_IP=http://${SERVER_IP}:${PLEX_PORT}/ --network=default plexinc/pms-docker:latest
   plexms:
     image: plexinc/pms-docker:latest
     container_name: plexms
