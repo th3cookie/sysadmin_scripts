@@ -1,16 +1,17 @@
-# Tautulli (aka PlexPy) – Monitoring Plex Usage
+# Tautulli - Previously PlexPy. Plex statistics and monitoring
+# Set HTTP Root in Tautulli settings if using PathPrefix
 tautulli:
+  image: linuxserver/tautulli
   container_name: tautulli
   hostname: tautulli
-  restart: always
-  image: linuxserver/tautulli
+  restart: unless-stopped
+  ports:
+    - ${TAUTULLI_PORT}:8181
   volumes:
     - ${USERDIR}/docker/tautulli/config:/config
     - ${USERDIR}/docker/tautulli/logs:/logs:ro
     - ${USERDIR}/docker/shared:/shared
-  ports:
-    - "8181:8181"
   environment:
-    - PUID=${PUID}
-    - PGID=${PGID}
-    - TZ=${TZ}
+    PUID: ${PUID}
+    PGID: ${PGID}
+    TZ: ${TZ}

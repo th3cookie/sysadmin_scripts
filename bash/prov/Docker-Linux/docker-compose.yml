@@ -17,6 +17,7 @@ services:
 
   portainer:
     image: portainer/portainer
+    hostname: portainer
     container_name: portainer
     restart: unless-stopped
     command: -H unix:///var/run/docker.sock
@@ -31,6 +32,7 @@ services:
 
   organizr:
     container_name: organizr
+    hostname: organizr
     restart: unless-stopped
     image: linuxserver/organizr
     volumes:
@@ -47,6 +49,7 @@ services:
   # Set url_base in Jackett settings if using PathPrefix
   jackett:
     image: linuxserver/jackett
+    hostname: jackett
     container_name: jackett
     restart: unless-stopped
     networks:
@@ -68,9 +71,10 @@ services:
 ############################# DATABASE
 
   mariadb:
+    image: mariadb
     container_name: mariadb
     restart: unless-stopped
-    image: mariadb
+    hostname: mariadb
     networks:
       - default
     ports:
@@ -223,6 +227,7 @@ services:
       UMASK_SET: 002
       TRANSMISSION_RPC_AUTHENTICATION_REQUIRED: "true"
       TRANSMISSION_RPC_HOST_WHITELIST: "127.0.0.1,${LOCAL_SUBNET}"
+      TRANSMISSION_RPC_WHITELIST_ENABLED: "true"
       TRANSMISSION_RPC_PASSWORD: ${TRANSMISSION_USER}
       TRANSMISSION_RPC_USERNAME: ${TRANSMISSION_PASS}
       TRANSMISSION_UMASK: 002
@@ -240,6 +245,7 @@ services:
       TRANSMISSION_WATCH_DIR: /downloads
       TRANSMISSION_WATCH_DIR_ENABLED: "true"
       TRANSMISSION_DOWNLOAD_DIR: /downloads/completed
+      TRANSMISSION_DOWNLOAD_QUEUE_SIZE: 50
   
 ############################# PVRS
 
@@ -258,6 +264,7 @@ services:
       - ${USERDIR}/docker/radarr:/config
       - ${USERDIR}/Downloads:/downloads
       - ${USERDIR}/mount/Video/Movies:/movies
+      - ${USERDIR}/docker/shared:/shared
       - "/etc/localtime:/etc/localtime:ro"
     environment:
       PUID: ${PUID}
@@ -280,6 +287,7 @@ services:
       - ${USERDIR}/docker/sonarr:/config
       - ${USERDIR}/Downloads:/downloads
       - ${USERDIR}/mount/Video/TV:/tv
+      - ${USERDIR}/docker/shared:/shared
       - "/etc/localtime:/etc/localtime:ro"
     environment:
       PUID: ${PUID}
@@ -312,6 +320,7 @@ services:
       - ${USERDIR}/mount/Video:/data
       - /dev/shm:/transcode # Offload transcoding to RAM if you have enough RAM. Otherwise, disk:
       # - ${USERDIR}/Downloads/plex_tmp:/transcode
+      - ${USERDIR}/docker/shared:/shared
     environment:
       TZ: ${TZ}
       HOSTNAME: "nucPlex"
