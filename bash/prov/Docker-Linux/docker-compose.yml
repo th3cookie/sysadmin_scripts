@@ -1,6 +1,6 @@
 #Reference: https://github.com/htpcBeginner/docker-traefik/blob/master/docker-compose-t1.yml
 #Requirement: Set environmental variables: USERDIR, PUID, PGID, MYSQL_ROOT_PASSWORD, and TZ as explained in the reference.
-
+#TEST
 version: "3.7"
 
 ############################# NETWORKS
