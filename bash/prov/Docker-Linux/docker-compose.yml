@@ -61,7 +61,7 @@ services:
     # - transmission-vpn
     volumes:
       - ${USERDIR}/docker/jackett:/config
-      - ${USERDIR}/mount/Downloads/blackhole:/downloads
+      - ${USERDIR}/mount/blackhole:/downloads
       - "/etc/localtime:/etc/localtime:ro"
     environment:
       PUID: ${PUID}

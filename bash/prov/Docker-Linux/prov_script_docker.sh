@@ -209,7 +209,7 @@ echo "PORTAINER_PORT=${PORTAINER_PORT}" | sudo tee -a /etc/environment
 echo "ORGANIZR_PORT=${ORGANIZR_PORT}" | sudo tee -a /etc/environment
 
 # Creating dir structure and properties
-mkdir -p ${USERDIR}/mount/Downloads ${USERDIR}/mount/Video ${USERDIR}/docker
+mkdir -p ${USERDIR}/mount/Downloads ${USERDIR}/mount/Video ${USERDIR}/mount/blackhole ${USERDIR}/docker
 sudo chmod -R 775 ${USERDIR}/docker
 sudo setfacl -Rdm g:docker:rwx ${USERDIR}/docker
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -220,6 +220,7 @@ cat << EOF | sudo tee -a /etc/fstab
 
 10.0.0.3:/volume1/Downloads ${USERDIR}/mount/Downloads nfs rsize=8192,wsize=8192,timeo=14,intr
 10.0.0.3:/volume1/Video ${USERDIR}/mount/Video nfs rsize=8192,wsize=8192,timeo=14,intr
+10.0.0.3:/volume1/Downloads/blackhole ${USERDIR}/mount/blackhole nfs rsize=8192,wsize=8192,timeo=14,intr
 EOF
 
 ##############################
