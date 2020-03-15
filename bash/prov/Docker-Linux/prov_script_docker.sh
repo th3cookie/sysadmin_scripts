@@ -238,11 +238,11 @@ EOF
     touch ${USERDIR}/.bash_aliases
 fi
 
-alias updategitdockeryml="cd ~/docker; docker-compose down; cd ~/git/sysadmin_scripts/; git pull; \
+cat << EOF >> ${HOME_DIR}/.bash_aliases
+alias updategitdockeryml='cd ~/docker; docker-compose down; cd ~/git/sysadmin_scripts/; git pull; \
 cp ~/git/sysadmin_scripts/bash/prov/Docker-Linux/docker-compose.yml ~/docker/docker-compose.yml; \
-cd ~/docker; docker-compose up -d"
-
-
+cd ~/docker; docker-compose up -d'
+EOF
 
 ##############
 ### Others ###
