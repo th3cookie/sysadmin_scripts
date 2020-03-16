@@ -283,8 +283,9 @@ chmod 600 ${HOME_DIR}/.ssh/config
 # Configuring Snapd
 systemctl start snapd.service
 
-# Installing spotify
+# Installing third-party stuff
 snap install spotify
+sudo npm install -g tldr
 
 eval `ssh-agent` &> /dev/null
 ssh-add ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk
