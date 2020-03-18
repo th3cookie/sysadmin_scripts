@@ -241,7 +241,7 @@ fi
 cat << EOF >> ${HOME_DIR}/.bashrc
 
 # SSH Stuff
-eval \`ssh-agent\` &> /dev/null
+pgrep ssh-agent || eval \`ssh-agent\`
 ssh-add ~/.ssh/sami-openssh-private-key.ppk &> /dev/null
 ssh-add ~/.ssh/SShakir-openssh-private-key &> /dev/null
 
@@ -287,7 +287,7 @@ systemctl start snapd.service
 snap install spotify
 sudo npm install -g tldr
 
-eval `ssh-agent` &> /dev/null
+pgrep ssh-agent || eval `ssh-agent`
 ssh-add ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk
 
 cd ${HOME_DIR}/git
