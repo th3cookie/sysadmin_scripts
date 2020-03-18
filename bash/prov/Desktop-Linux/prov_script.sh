@@ -108,7 +108,6 @@ else
     cat << EOF >> ${HOME_DIR}/.bash_aliases
 alias ovpn='sudo openvpn --config ~/work/hostopia.ovpn &'
 alias sshdocker='ssh root@10.0.0.9'
-alias sshgoodboy='ssh root@10.0.0.7'
 alias sshnas='ssh -p 7022 admin@10.0.0.3'
 EOF
     # Downloading files from NAS
