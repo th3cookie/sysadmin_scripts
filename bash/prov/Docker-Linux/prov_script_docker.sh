@@ -208,6 +208,9 @@ echo "TAUTULLI_PORT=${TAUTULLI_PORT}" | sudo tee -a /etc/environment
 echo "PORTAINER_PORT=${PORTAINER_PORT}" | sudo tee -a /etc/environment
 echo "ORGANIZR_PORT=${ORGANIZR_PORT}" | sudo tee -a /etc/environment
 
+# Removing the local DNS resolver from binding to port 53 so pihole can do this DNS instead
+echo "DNSStubListener=no" | sudo tee -a /etc/systemd/resolved.conf
+
 # Creating dir structure and properties
 mkdir -p ${USERDIR}/mount/Downloads ${USERDIR}/mount/Video ${USERDIR}/mount/blackhole ${USERDIR}/docker
 sudo chmod -R 775 ${USERDIR}/docker
