@@ -78,7 +78,7 @@ mkdir -p ${HOME_DIR}/work ${HOME_DIR}/Downloads /mnt/NAS/Samis_folder
 $INSTALL_COMMAND update
 $INSTALL_COMMAND upgrade
 $INSTALL_COMMAND install -y cifs-utils openvpn facter ruby puppet python3.8 firefox git bash-completion vim pip npm curl wget telnet ShellCheck xclip subnetcalc \
-snapd grub-customizer
+snapd grub-customizer terminator
 if [[ $? -ne 0 ]]; then
     echo "Could not download some/all of the packages, please check package manager history."
 fi
@@ -116,9 +116,12 @@ EOF
         echo -e "Could not download openvpn profile and SSH keys from NAS.\nCheck if you can mount cifs or not."
     else
         cp /mnt/NAS/Samis_folder/ops/hostopia.ovpn ${HOME_DIR}/work
+        cp $SCRIPT_DIR/configs/.vimrc ${HOME_DIR}/
         cp /mnt/NAS/Samis_folder/ops/ssh_keys/sami-openssh-private-key.ppk ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk
         cp /mnt/NAS/Samis_folder/ops/ssh_keys/Work/SShakir-openssh-private-key ${HOME_DIR}/.ssh/SShakir-openssh-private-key
-        chmod 600 ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk ${HOME_DIR}/.ssh/SShakir-openssh-private-key
+        cp $SCRIPT_DIR/configs/ssh_config ${HOME_DIR}/.ssh/config
+        sudo chmod 600 ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk ${HOME_DIR}/.ssh/SShakir-openssh-private-key ${HOME_DIR}/.ssh/config
+        sudo chown $REAL_USER. ${HOME_DIR}/.ssh/SShakir-openssh-private-key ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk ${HOME_DIR}/.ssh/config
         cp /mnt/NAS/Samis_folder/ops/prov_apps/* ${HOME_DIR}/Downloads/
     fi
     echo -e 'Downloading tor. It then needs to be extracted and placed in a $PATH directory to be able to start.'
@@ -274,10 +277,6 @@ EOF
 # Installing local rpm's
 cd ${HOME_DIR}/Downloads/
 sudo dnf localinstall slack-*
-
-cp $SCRIPT_DIR/configs/.vimrc ${HOME_DIR}/
-cp $SCRIPT_DIR/configs/ssh_config ${HOME_DIR}/.ssh/config
-chmod 600 ${HOME_DIR}/.ssh/config
 
 # Configuring Snapd
 systemctl start snapd.service
