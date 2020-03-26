@@ -276,7 +276,7 @@ EOF
 
 # Installing local rpm's
 cd ${HOME_DIR}/Downloads/
-sudo dnf localinstall slack-*
+sudo dnf localinstall -y slack-*
 
 # Configuring Snapd
 systemctl start snapd.service
