@@ -255,3 +255,6 @@ EOF
 cp $SCRIPT_DIR/docker-compose.yml ${USERDIR}/docker
 chmod +x ./parse-yaml.py
 sudo ${PY_VERSION} ./parse-yaml.py
+
+# Need to add this to crontab
+# docker-compose -f ~/docker/docker-compose.yml pull; docker-compose -f ~/docker/docker-compose.yml up -d --remove-orphans
