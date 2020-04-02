@@ -72,7 +72,7 @@ GIT_DIR=${HOME_DIR}/git
 mkdir $GIT_DIR
 chown -R $REAL_USER:$REAL_USER $GIT_DIR
 chmod 755 $GIT_DIR
-mkdir -p ${HOME_DIR}/work ${HOME_DIR}/Downloads /mnt/NAS/Samis_folder 
+mkdir -p ${HOME_DIR}/work ${HOME_DIR}/Downloads /mnt/NAS/Samis_folder ${HOME_DIR}/.config/terminator/plugins
 
 # Installing required packages
 $INSTALL_COMMAND update
@@ -312,3 +312,8 @@ $INSTALL_COMMAND install -y ffmpeg vlc
 if [[ $? -ne 0 ]]; then
     echo "Could not download some/all of the 'RPM Fusion' packages, please check package manager history."
 fi
+
+pip3 install requests
+wget https://git.io/v5Zww -O ${HOME_DIR}"/.config/terminator/plugins/terminator-themes.py"
+echo "To activate terminator profiles, check the TerminatorThemes option under terminator > preferences > plugins."
+echo "See here for further instructions -> https://github.com/EliverLara/terminator-themes"
