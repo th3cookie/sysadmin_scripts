@@ -313,7 +313,10 @@ if [[ $? -ne 0 ]]; then
     echo "Could not download some/all of the 'RPM Fusion' packages, please check package manager history."
 fi
 
-pip3 install requests
+sudo pip3 install requests
+sudo pip2 install requests
 wget https://git.io/v5Zww -O ${HOME_DIR}"/.config/terminator/plugins/terminator-themes.py"
-echo "To activate terminator profiles, check the TerminatorThemes option under terminator > preferences > plugins."
+python2 ${HOME_DIR}"/.config/terminator/plugins/terminator-themes.py"
+python3 ${HOME_DIR}"/.config/terminator/plugins/terminator-themes.py"
+echo "To activate terminator profiles, right click in terminator > preferences > plugins > Tick 'TerminatorThemes'."
 echo "See here for further instructions -> https://github.com/EliverLara/terminator-themes"
