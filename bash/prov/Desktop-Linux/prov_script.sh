@@ -316,8 +316,9 @@ fi
 sudo pip3 install requests
 sudo pip2 install requests
 wget https://git.io/v5Zww -O ${HOME_DIR}"/.config/terminator/plugins/terminator-themes.py"
-python2 ${HOME_DIR}"/.config/terminator/plugins/terminator-themes.py"
-python3 ${HOME_DIR}"/.config/terminator/plugins/terminator-themes.py"
+python2 ${HOME_DIR}/.config/terminator/plugins/terminator-themes.py
+python3 ${HOME_DIR}/.config/terminator/plugins/terminator-themes.py
+cp $SCRIPT_DIR/configs/terminator_config ${HOME_DIR}/.config/terminator/config
 echo "To activate terminator profiles, right click in terminator > preferences > plugins > Tick 'TerminatorThemes'."
 echo "See here for further instructions -> https://github.com/EliverLara/terminator-themes"
 echo "SPOILERS: I like the theme 'PaulMillr'."
