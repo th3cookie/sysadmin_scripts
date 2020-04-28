@@ -1,9 +1,3 @@
 # Spam Checker - How to use
 
-touch ~/chk_spam.sh; chmod +x ~/chk_spam.sh; vim ~/chk_spam.sh
-
--- Copy Paste the script --
-
-Fill in the MSGID as param 1 (below) when calling script.
-
-~/chk_spam.sh 1ilXEq-003lzk-FR
+MSGID="1jEIff-008TY2-QR"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/work/email_spam/spam_checker.sh) $MSGID

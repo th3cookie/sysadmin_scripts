@@ -1,6 +1,6 @@
 #!/bin/bash
-# Usage -> MSGID="1jEIff-008TY2-QR"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/work/spam/spam_checker.sh) $MSGID
-# Usage 2 -> MSGID="1itJK6-004Keg-O7"; wget https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/work/spam/spam_checker.sh -O ~/chk_spam.sh && chmod +x ~/chk_spam.sh; ~/chk_spam.sh $MSGID
+# Usage -> MSGID="1jEIff-008TY2-QR"; bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/work/email_spam/spam_checker.sh) $MSGID
+# Usage 2 -> MSGID="1itJK6-004Keg-O7"; wget https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/work/email_spam/spam_checker.sh -O ~/chk_spam.sh && chmod +x ~/chk_spam.sh; ~/chk_spam.sh $MSGID
 
 MSGID="$1";
 if [[ -z $MSGID ]]; then
