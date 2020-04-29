@@ -4,13 +4,13 @@ LOGS=$(grep -P '(wp-login|xmlrpc).*\"\ 200\ ' /usr/local/apache/domlogs/*/* | gr
 echo "${LOGS}" | while read i; do
     COUNT=$(echo "${i}" | awk '{print $1}')
     IP=$(echo "${i}" | awk '{print $2}')
-    GEO=$(geoiplookup ${i})
+    GEO=$(geoiplookup ${i} | grep "Country Edition")
     echo -e "IP:\t\t\t\t\t${IP}"
     echo -e "Org Name:\t\t\t\t$(whois ${IP} | grep -P '[oO][rR][gG].{0,1}[nN][aA][mM][eE]' | head -n 1 | awk '{$1=""; print substr($0,2)}')"
     echo -e "Geoiplookup:\t\t\t\t${GEO}"
     echo -e "Count of hits: \t\t\t\t${COUNT}"
     echo -e "Block with: \t\t\t\tcsf -d $IP \"website attack\""
-    echo -e "Last 10 logs:\n\n$(grep -r $IP /usr/local/apache/domlogs/ | tail)\n\n-----------------------------------------------------------------------\n"
+    echo -e "Last 10 logs:\n\n$(grep -r $IP /usr/local/apache/domlogs/ | grep POST | tail)\n\n-----------------------------------------------------------------------\n"
 done
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
