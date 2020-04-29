@@ -10,6 +10,10 @@ echo "${LOGS}" | while read i; do
     echo -e "Geoiplookup:\t\t\t\t${GEO}"
     echo -e "Count of hits: \t\t\t\t${COUNT}"
     echo -e "Block with: \t\t\t\tcsf -d $IP \"website attack\""
+    if [[ ! "$GEO" =~ ([aA][uU][sS]) ]]
+    then
+        echo 'YAY TO BLOCK'
+    fi
     echo -e "Last 10 logs:\n\n$(grep -r $IP /usr/local/apache/domlogs/ | grep POST | tail)\n\n-----------------------------------------------------------------------\n"
 done
 
