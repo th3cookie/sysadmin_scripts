@@ -1,4 +1,4 @@
-# Checks top 20 wp hits and gives you list of them with csf commands to block
+# Checks top 20 wp hits this hour and blocks any attempts not from AUS with > 10 hits
 
 LOGS=$(grep -P '(wp-login|xmlrpc).*\"\ 200\ ' /usr/local/apache/domlogs/*/* | grep POST | grep $(date +%Y:%H) | cut -d " " -f 1 | cut -d ':' -f 2 | sort | uniq -c | sort -n | tail -n 20)
 echo "${LOGS}" | while read i; do
@@ -9,10 +9,9 @@ echo "${LOGS}" | while read i; do
     echo -e "Org Name:\t\t\t\t$(whois ${IP} | grep -P '[oO][rR][gG].{0,1}[nN][aA][mM][eE]' | head -n 1 | awk '{$1=""; print substr($0,2)}')"
     echo -e "Geoiplookup:\t\t\t\t${GEO}"
     echo -e "Count of hits: \t\t\t\t${COUNT}"
-    echo -e "Block with: \t\t\t\tcsf -d $IP \"website attack\""
-    if [[ ! "$GEO" =~ ([aA][uU][sS]) ]]
+    if [[ ! "$GEO" =~ ([aA][uU][sS]) ]] && [[ ${COUNT} -gt 10 ]]
     then
-        echo 'YAY TO BLOCK'
+        csf -d $IP "website attack"
     fi
     echo -e "Last 10 logs:\n\n$(grep -r $IP /usr/local/apache/domlogs/ | grep POST | tail)\n\n-----------------------------------------------------------------------\n"
 done
