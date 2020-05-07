@@ -9,7 +9,7 @@ fi
 
 case "$1" in
 
-wp) echo "Blocking top WP abusers by IP (Excluding Aus)..."
+wp) echo "Blocking top 20 WP abusers by IP (Excluding Aus)..."
     # Checks top 20 wp hits this hour and blocks any attempts not from AUS with > 5 hits
 
     LOGS=$(grep -P '(wp-login|xmlrpc).*\"\ 200\ ' /usr/local/apache/domlogs/*/* | grep POST | grep $(date +%Y:%H) | cut -d " " -f 1 | cut -d ':' -f 2 | sort | uniq -c | sort -rn | head -n 20)
@@ -34,7 +34,7 @@ wp) echo "Blocking top WP abusers by IP (Excluding Aus)..."
     done
     ;;
 
-wpau) echo "Blocking top WP abusers by IP (including Aus)..."
+wpau) echo "Blocking top 20 WP abusers by IP (including Aus)..."
     # Checks for most wp hits this hour and csf blocks top 20
 
     for i in $(grep "`date +%d/%b/%Y:%H:`" /usr/local/apache/domlogs/* | grep POST | grep -E 'xmlrpc|wp-login' | cut -d ':' -f 2 | awk '{ print $1 }' | sort | uniq -c | sort -nr | head -n 20 | awk '{print $2}'); do
