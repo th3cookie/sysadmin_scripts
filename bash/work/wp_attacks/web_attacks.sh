@@ -1,6 +1,6 @@
 # Checks top 20 wp hits this hour and blocks any attempts not from AUS with > 10 hits
 
-LOGS=$(grep -P '(wp-login|xmlrpc).*\"\ 200\ ' /usr/local/apache/domlogs/*/* | grep POST | grep $(date +%Y:%H) | cut -d " " -f 1 | cut -d ':' -f 2 | sort | uniq -c | sort -n | tail -n 20)
+LOGS=$(grep -P '(wp-login|xmlrpc).*\"\ 200\ ' /usr/local/apache/domlogs/*/* | grep POST | grep $(date +%Y:%H) | cut -d " " -f 1 | cut -d ':' -f 2 | sort | uniq -c | sort -rn | head -n 20)
 echo "${LOGS}" | while read i; do
     COUNT=$(echo "${i}" | awk '{print $1}')
     IP=$(echo "${i}" | awk '{print $2}')
