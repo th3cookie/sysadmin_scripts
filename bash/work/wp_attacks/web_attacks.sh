@@ -21,9 +21,14 @@ wp) echo "Blocking top WP abusers by IP (Excluding Aus)..."
         echo -e "Org Name:\t\t\t\t$(whois ${IP} | grep -P '[oO][rR][gG].{0,1}[nN][aA][mM][eE]' | head -n 1 | awk '{$1=""; print substr($0,2)}')"
         echo -e "Geoiplookup:\t\t\t\t${GEO}"
         echo -e "Count of hits: \t\t\t\t${COUNT}"
-        if [[ ! "$GEO" =~ ([aA][uU][sS]) ]] && [[ ${COUNT} -gt 10 ]]
+        if [[ ! "$GEO" =~ ([aA][uU][sS]) ]] && [[ ${COUNT} -gt 5 ]]
         then
             csf -d $IP "website attack"
+        fi
+        if [[ ${COUNT} -lt 5 ]]
+        then
+            echo "The rest have < 5 attempts, bailing the script..."
+            exit 1
         fi
         echo -e "Last 10 logs:\n\n$(grep -r $IP /usr/local/apache/domlogs/ | grep POST | tail)\n\n-----------------------------------------------------------------------\n"
     done
