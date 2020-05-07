@@ -10,7 +10,7 @@ fi
 case "$1" in
 
 wp) echo "Blocking top WP abusers by IP (Excluding Aus)..."
-    # Checks top 20 wp hits this hour and blocks any attempts not from AUS with > 10 hits
+    # Checks top 20 wp hits this hour and blocks any attempts not from AUS with > 5 hits
 
     LOGS=$(grep -P '(wp-login|xmlrpc).*\"\ 200\ ' /usr/local/apache/domlogs/*/* | grep POST | grep $(date +%Y:%H) | cut -d " " -f 1 | cut -d ':' -f 2 | sort | uniq -c | sort -rn | head -n 20)
     echo "${LOGS}" | while read i; do
