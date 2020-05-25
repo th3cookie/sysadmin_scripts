@@ -322,3 +322,5 @@ cp $SCRIPT_DIR/configs/terminator_config ${HOME_DIR}/.config/terminator/config
 echo "To activate terminator profiles, right click in terminator > preferences > plugins > Tick 'TerminatorThemes'."
 echo "See here for further instructions -> https://github.com/EliverLara/terminator-themes"
 echo "SPOILERS: I like the theme 'PaulMillr'."
+
+[[ -e /etc/ssh/ssh_config ]] && sudo sed -i '/HashKnownHosts/ s/yes$/no/' /etc/ssh/ssh_config
