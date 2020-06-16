@@ -1,5 +1,5 @@
 #!/bin/bash
-# Usage -> bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/bash/work/wp_attacks/web_attacks.sh) wp
+# Usage -> bash <(curl https://raw.githubusercontent.com/th3cookie/sysadmin_scripts/master/work/wp_attacks/web_attacks.sh) wp
 
 if [ $# -ne 1 ]
 then
