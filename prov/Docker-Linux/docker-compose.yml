@@ -69,31 +69,31 @@ services:
 ############################# DNS
   
 # More info at https://github.com/pi-hole/docker-pi-hole/ and https://docs.pi-hole.net/
-pihole:
-  container_name: pihole
-  hostname: pihole
-  image: pihole/pihole:latest
-  restart: unless-stopped
-  ports:
-    - "53:53/tcp"
-    - "53:53/udp"
-    - "67:67/udp"
-    - "9020:80/tcp"
-    - "9021:443/tcp"
-  environment:
-    TZ: ${TZ}
+  # pihole:
+  #   container_name: pihole
+  #   hostname: pihole
+  #   image: pihole/pihole:latest
+  #   restart: unless-stopped
+  #   ports:
+  #     - "53:53/tcp"
+  #     - "53:53/udp"
+  #     - "67:67/udp"
+  #     - "9020:80/tcp"
+  #     - "9021:443/tcp"
+  #   environment:
+  #     TZ: ${TZ}
     # WEBPASSWORD: 'set a secure password here or it will be random'
   # Volumes store your data between container upgrades
-  volumes:
-    - ${USERDIR}/docker/pihole/:/etc/pihole/
-    - ${USERDIR}/docker/dnsmasq.d/:/etc/dnsmasq.d/
-  dns:
-    - 127.0.0.1
-    - 1.1.1.1
+  # volumes:
+  #   - ${USERDIR}/docker/pihole/:/etc/pihole/
+  #   - ${USERDIR}/docker/dnsmasq.d/:/etc/dnsmasq.d/
+  # dns:
+  #   - 127.0.0.1
+  #   - 1.1.1.1
   # Recommended but not required (DHCP needs NET_ADMIN)
   #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
-  cap_add:
-    - NET_ADMIN
+  # cap_add:
+  #   - NET_ADMIN
 
 ############################# DATABASE
 
@@ -253,7 +253,7 @@ pihole:
       PGID: ${PGID}
       TZ: ${TZ}
       UMASK_SET: 002
-      TRANSMISSION_RPC_AUTHENTICATION_REQUIRED: "true"
+      TRANSMISSION_RPC_AUTHENTICATION_REQUIRED: "false"
       TRANSMISSION_RPC_HOST_WHITELIST_ENABLED: "false"
       TRANSMISSION_RPC_HOST_WHITELIST: "127.0.0.1,172.16.0.0/12,${LOCAL_SUBNET}"
       TRANSMISSION_RPC_WHITELIST_ENABLED: "false"
