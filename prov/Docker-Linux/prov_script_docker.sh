@@ -70,10 +70,10 @@ echo ''
 read -p 'Transmission Username: ' TRANSMISSION_USER
 read -sp 'Transmission Password: ' TRANSMISSION_PASS
 echo ''
-read -p "Would you like your MariaDB root password generated automatically? Otherwise, type the MySQL password: [Yy|Password] " MYSQL_ROOT_PASSWORD
-if [[ ${MYSQL_ROOT_PASSWORD} =~ ^[Yy]$ ]]; then
-    MYSQL_ROOT_PASSWORD=$(date +%s | sha256sum | base64 | head -c 12)
-fi
+# read -p "Would you like your MariaDB root password generated automatically? Otherwise, type the MySQL password: [Yy|Password] " MYSQL_ROOT_PASSWORD
+# if [[ ${MYSQL_ROOT_PASSWORD} =~ ^[Yy]$ ]]; then
+#     MYSQL_ROOT_PASSWORD=$(date +%s | sha256sum | base64 | head -c 12)
+# fi
 
 # Comment the below if the user is different
 NAS_USER=admin
@@ -82,10 +82,10 @@ if [[ -z ${NAS_USER} ]]; then
 fi
 read -sp 'NAS Password: ' NAS_PASS
 echo ''
-read -p 'Varken Username? ' VARKEN_USER
-read -sp 'Varken Password: ' VARKEN_PASS
-echo ''
-read -p 'Tautulli API Key (Leave blank if unsure, manually add it later to "/etc/environment" file): ' TAUTULLI_API_KEY
+# read -p 'Varken Username? ' VARKEN_USER
+# read -sp 'Varken Password: ' VARKEN_PASS
+# echo ''
+# read -p 'Tautulli API Key (Leave blank if unsure, manually add it later to "/etc/environment" file): ' TAUTULLI_API_KEY
 read -p 'Sonarr API Key (Leave blank if unsure, manually add it later to "/etc/environment" file): ' SONARR_API_KEY
 read -p 'Radarr API Key (Leave blank if unsure, manually add it later to "/etc/environment" file): ' RADARR_API_KEY
 read -p 'Plex Claim Token (Grab it from here - https://www.plex.tv/claim/ - otherwise leave blank if unsure): ' PLEX_CLAIM
@@ -145,25 +145,25 @@ USERDIR="/home/${REAL_USER}"
 # Static Variables
 ##### PORTS
 PORTAINER_PORT=9000
-ORGANIZR_PORT=9001
-PHPMYADMIN_PORT=8000
-INFLUXDB_PORT=8086
+# ORGANIZR_PORT=9001
+# PHPMYADMIN_PORT=8000
+# INFLUXDB_PORT=8086
 JACKETT_PORT=9117
 #If you change radarr and sonarr port then update plex meta agent
 RADARR_PORT=7878
 SONARR_PORT=8989
-GRAFANA_PORT=3000
+# GRAFANA_PORT=3000
 TRANSMISSION_PORT=9091
 PLEX_PORT=32400
 PLEX_WEB_TOOLS_PORT=33400
 BAZARR_PORT=6767
-TAUTULLI_PORT=8181
+# TAUTULLI_PORT=8181
 
 echo "PUID=${PUID}" | sudo tee -a /etc/environment
 echo "PGID=${PGID}" | sudo tee -a /etc/environment
 echo "TZ=${TZ}" | sudo tee -a /etc/environment
 echo "USERDIR=${USERDIR}" | sudo tee -a /etc/environment
-echo "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}" | sudo tee -a /etc/environment
+# echo "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}" | sudo tee -a /etc/environment
 echo "VPN_PROVIDER=${VPN_PROVIDER}" | sudo tee -a /etc/environment
 echo "VPN_USER=${VPN_USER}" | sudo tee -a /etc/environment
 echo "VPN_PASS=${VPN_PASS}" | sudo tee -a /etc/environment
@@ -172,13 +172,13 @@ echo "TRANSMISSION_PASS=${TRANSMISSION_PASS}" | sudo tee -a /etc/environment
 echo "LOCAL_SUBNET=${LOCAL_SUBNET}" | sudo tee -a /etc/environment
 echo "TRANSMISSION_WHITELIST=${TRANSMISSION_WHITELIST}" | sudo tee -a /etc/environment
 echo "SERVER_IP=${SERVER_IP}" | sudo tee -a /etc/environment
-echo "VARKEN_USER=${VARKEN_USER}" | sudo tee -a /etc/environment
-echo "VARKEN_PASS=${VARKEN_PASS}" | sudo tee -a /etc/environment
-if [[ -n ${TAUTULLI_API_KEY} ]]; then
-    echo "TAUTULLI_API_KEY=${TAUTULLI_API_KEY}" | sudo tee -a /etc/environment
-else
-    echo "TAUTULLI_API_KEY=" | sudo tee -a /etc/environment
-fi
+# echo "VARKEN_USER=${VARKEN_USER}" | sudo tee -a /etc/environment
+# echo "VARKEN_PASS=${VARKEN_PASS}" | sudo tee -a /etc/environment
+# if [[ -n ${TAUTULLI_API_KEY} ]]; then
+#     echo "TAUTULLI_API_KEY=${TAUTULLI_API_KEY}" | sudo tee -a /etc/environment
+# else
+#     echo "TAUTULLI_API_KEY=" | sudo tee -a /etc/environment
+# fi
 if [[ -n ${SONARR_API_KEY} ]]; then
     echo "SONARR_API_KEY=${SONARR_API_KEY}" | sudo tee -a /etc/environment
 else
@@ -194,26 +194,26 @@ if [[ -n ${PLEX_CLAIM} ]]; then
 else
     echo "PLEX_CLAIM=" | sudo tee -a /etc/environment
 fi
-echo "PHPMYADMIN_PORT=${PHPMYADMIN_PORT}" | sudo tee -a /etc/environment
-echo "INFLUXDB_PORT=${INFLUXDB_PORT}" | sudo tee -a /etc/environment
+# echo "PHPMYADMIN_PORT=${PHPMYADMIN_PORT}" | sudo tee -a /etc/environment
+# echo "INFLUXDB_PORT=${INFLUXDB_PORT}" | sudo tee -a /etc/environment
 echo "JACKETT_PORT=${JACKETT_PORT}" | sudo tee -a /etc/environment
 echo "RADARR_PORT=${RADARR_PORT}" | sudo tee -a /etc/environment
 echo "SONARR_PORT=${SONARR_PORT}" | sudo tee -a /etc/environment
-echo "GRAFANA_PORT=${GRAFANA_PORT}" | sudo tee -a /etc/environment
+# echo "GRAFANA_PORT=${GRAFANA_PORT}" | sudo tee -a /etc/environment
 echo "TRANSMISSION_PORT=${TRANSMISSION_PORT}" | sudo tee -a /etc/environment
 echo "PLEX_PORT=${PLEX_PORT}" | sudo tee -a /etc/environment
 echo "PLEX_WEB_TOOLS_PORT=${PLEX_WEB_TOOLS_PORT}" | sudo tee -a /etc/environment
 echo "BAZARR_PORT=${BAZARR_PORT}" | sudo tee -a /etc/environment
-echo "TAUTULLI_PORT=${TAUTULLI_PORT}" | sudo tee -a /etc/environment
+# echo "TAUTULLI_PORT=${TAUTULLI_PORT}" | sudo tee -a /etc/environment
 echo "PORTAINER_PORT=${PORTAINER_PORT}" | sudo tee -a /etc/environment
-echo "ORGANIZR_PORT=${ORGANIZR_PORT}" | sudo tee -a /etc/environment
+# echo "ORGANIZR_PORT=${ORGANIZR_PORT}" | sudo tee -a /etc/environment
 
 # Removing the local DNS resolver from binding to port 53 so pihole can do this DNS instead
 echo "DNSStubListener=no" | sudo tee -a /etc/systemd/resolved.conf
 systemctl restart systemd-resolved.service
 
 # Creating dir structure and properties
-mkdir -p ${USERDIR}/mount/Downloads ${USERDIR}/mount/Video ${USERDIR}/mount/blackhole ${USERDIR}/docker
+mkdir -p ${USERDIR}/mount/Downloads ${USERDIR}/mount/Video ${USERDIR}/mount/blackhole ${USERDIR}/docker ${USERDIR}/mount/docker_backups
 sudo chmod -R 775 ${USERDIR}/docker
 sudo setfacl -Rdm g:docker:rwx ${USERDIR}/docker
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -225,6 +225,7 @@ cat << EOF | sudo tee -a /etc/fstab
 10.0.0.3:/volume1/Downloads ${USERDIR}/mount/Downloads nfs rsize=8192,wsize=8192,timeo=14,intr
 10.0.0.3:/volume1/Video ${USERDIR}/mount/Video nfs rsize=8192,wsize=8192,timeo=14,intr
 10.0.0.3:/volume1/Downloads/blackhole ${USERDIR}/mount/blackhole nfs rsize=8192,wsize=8192,timeo=14,intr
+10.0.0.3:/volume1/Computer_Stuff/docker_backups ${USERDIR}/mount/docker_backups nfs rsize=8192,wsize=8192,timeo=14,intr
 EOF
 
 ##############################
@@ -253,8 +254,13 @@ EOF
 ##############
 
 cp $SCRIPT_DIR/docker-compose.yml ${USERDIR}/docker
+sudo cp $SCRIPT_DIR/docker-backup.sh /etc/cron.weekly/
+sudo chown root. /etc/cron.weekly/docker-backup.sh
+sudo chmod +x /etc/cron.weekly/docker-backup.sh
 chmod +x ./parse-yaml.py
 sudo ${PY_VERSION} ./parse-yaml.py
 
-# Need to add this to crontab
-# docker-compose -f ~/docker/docker-compose.yml pull; docker-compose -f ~/docker/docker-compose.yml up -d --remove-orphans
+cat << EOF | sudo tee -a /etc/cron.d/docker_crons.sh
+0 4 * * * cd ${USERDIR}/docker; /usr/local/bin/docker-compose pull; /usr/local/bin/docker-compose up -d --remove-orphans
+@reboot cd ${USERDIR}/docker; /usr/local/bin/docker-compose up -d;
+EOF

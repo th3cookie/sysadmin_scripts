@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.8
-# This script will parse the docker compose and print the services/ports to the MOTD. It will create this file if it doesn't exist as well.
+# This script will parse the docker compose and create the relevant directory structure.
 
 import yaml
 import os
