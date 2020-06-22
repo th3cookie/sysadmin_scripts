@@ -265,6 +265,7 @@ alias ss='sudo ss'
 alias systemctl='sudo systemctl'
 alias copy='xclip -sel clip'
 alias spotify='spotify &'
+alias python='python3.8'
 EOF
 
 . ${HOME_DIR}/.bash_aliases
