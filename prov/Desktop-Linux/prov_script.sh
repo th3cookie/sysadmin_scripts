@@ -292,6 +292,8 @@ ssh-add ${HOME_DIR}/.ssh/sami-openssh-private-key.ppk
 cd ${HOME_DIR}/git
 git config --global user.name "${GIT_USERNAME}"
 git config --global user.email "${GIT_EMAIL}"
+git config --global core.excludesfile ${HOME_DIR}/git/.gitignore_global
+echo ".vscode" | tee -a ${HOME_DIR}/git/.gitignore_global
 
 git clone git@github.com:th3cookie/StudyScripts.git
 git clone git@github.com:th3cookie/sysadmin_scripts.git
