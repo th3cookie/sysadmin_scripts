@@ -91,15 +91,15 @@ if [[ ${WORKPC} =~ [Yy] ]]; then
     # .bash_aliases for work
     cat << EOF >> ${HOME_DIR}/.bash_aliases
 function hosted() {
-	host $1 | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" | xargs host | awk '{print $5}' | bash -ic "xargs whm"
+	host \$1 | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" | xargs host | awk '{print \$5}' | bash -ic "xargs whm"
 }
 alias pulldev='ssh -tq puppet02 "bash -ic pulldev"'
 alias pullstaging='ssh -tq puppet02 "bash -ic pullstaging"'
 function sslchk() {
-        firefox https://www.sslshopper.com/ssl-checker.html#hostname=$1 &
+        firefox https://www.sslshopper.com/ssl-checker.html#hostname=\$1 &
 }
 function fixpup() {
-    echo "Doing puppet manifest checks - Lint and Parser..."; echo "If there is no output below, everything is fine."; echo "-------------------------------------------------"; puppet-lint $1; puppet parser validate $1;
+    echo "Doing puppet manifest checks - Lint and Parser..."; echo "If there is no output below, everything is fine."; echo "-------------------------------------------------"; puppet-lint \$1; puppet parser validate \$1;
 }
 EOF
 else
@@ -205,12 +205,12 @@ if [[ $INSTALL_COMMAND =~ (dnf|yum) ]]; then
     echo "password=${rootpass}" >> ${HOME_DIR}/.my.cnf
     echo "Mysql root password stored in ${HOME_DIR}/.my.cnf"
     mysql -u root <<-EOF
-UPDATE mysql.user SET Password=PASSWORD('$rootpass') WHERE User='root';
-DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
-DELETE FROM mysql.user WHERE User='';
-DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
-FLUSH PRIVILEGES;
-EOF
+		UPDATE mysql.user SET Password=PASSWORD('$rootpass') WHERE User='root';
+		DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+		DELETE FROM mysql.user WHERE User='';
+		DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
+		FLUSH PRIVILEGES;
+	EOF
 elif [[ $INSTALL_COMMAND =~ apt ]]; then
     tasksel install lamp-server
     if [[ $? -ge 1 ]]; then
@@ -266,6 +266,11 @@ alias systemctl='sudo systemctl'
 alias copy='xclip -sel clip'
 alias spotify='spotify &'
 alias python='python3.8'
+function torhost() {
+        TOR=\$(host \${1} | grep -oP '(?<=vlan).*' | cut -d '.' -f 2-)
+        TOR2=\${TOR::-1}
+        ssh \${TOR2}
+}
 EOF
 
 . ${HOME_DIR}/.bash_aliases
