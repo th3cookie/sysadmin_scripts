@@ -1,83 +1,86 @@
 Host github.com
-    User git
-    IdentityFile ~/.ssh/sami-openssh-private-key.ppk
+	User git
+	IdentityFile ~/.ssh/sami-openssh-private-key.ppk
 
 Host *
-        ForwardAgent yes
-        KeepAlive yes
-        ServerAliveInterval 60
-        AddressFamily inet
+	ForwardAgent yes
+	KeepAlive yes
+	ServerAliveInterval 60
+	AddressFamily inet
 
 # Work configs
 
 Host oob01.eqsy3.digitalpacific.com.au
-        Port 2274
-        User sshakir
+	Port 2274
+	User sshakir
 
 Host puppet02
-        Hostname puppet02.digitalpacific.com.au
-        User SShakir
+	Hostname puppet02.digitalpacific.com.au
+	User SShakir
 
 Host puppet03
-        Hostname puppet03.digitalpacific.com.au
-        User SShakir
+	Hostname puppet03.digitalpacific.com.au
+	User SShakir
 
 Host staff01
-        Hostname staff01.digitalpacific.com.au
-        User SShakir
+	Hostname staff01.digitalpacific.com.au
+	User SShakir
 
 Host syslog01
-        Hostname syslog01.digitalpacific.com.au
-        User SShakir
+	Hostname syslog01.digitalpacific.com.au
+	User SShakir
 
 Host rr01
-        Hostname rapidrestore-workspace.int.digitalpacific.com.au
+	Hostname rapidrestore-workspace.int.digitalpacific.com.au
 
 Host rr02
-        Hostname rapidrestore-workspace02.int.digitalpacific.com.au
+	Hostname rapidrestore-workspace02.int.digitalpacific.com.au
 
 Host rr03
-        Hostname rapidrestore-workspace03.int.digitalpacific.com.au
+	Hostname rapidrestore-workspace03.int.digitalpacific.com.au
 
 Host rr04
-        Hostname rapidrestore-workspace04.int.digitalpacific.com.au
+	Hostname rapidrestore-workspace04.int.digitalpacific.com.au
 
 Host rr05
-        Hostname rapidrestore-workspace05.int.digitalpacific.com.au
+	Hostname rapidrestore-workspace05.int.digitalpacific.com.au
 
 Host ded*
-        user root
-        CanonicalizeHostname always
-        CanonicalDomains smartservers.com.au digitalpacific.com.au
-        CanonicalizeFallbackLocal yes
+	user root
+	CanonicalizeHostname always
+	CanonicalDomains smartservers.com.au digitalpacific.com.au
+	CanonicalizeFallbackLocal yes
 
 Host cpdev
-        Hostname cpanel-dev.ha-node.net
-        User root
+	Hostname cpanel-dev.ha-node.net
+	User root
 
 Host dpded
-        Hostname ded.somethinglikesami.net
-        User root
-        Port 7022
+	Hostname ded.somethinglikesami.net
+	User root
+	Port 7022
 
 Host dsw*
-        User sshakir
+	User sshakir
+
+Host fw01.ded.apdcsy1.as55803.net.au
+	User sshakir
 
 Host web03
-        Hostname web03.digitalpacific.com.au
+	Hostname web03.digitalpacific.com.au
 
 Host web.dp
-        Hostname web.digitalpacific.com.au
+	Hostname web.digitalpacific.com.au
 
 Host dir01
-    Hostname dir01.digitalpacific.com.au
-    ForwardX11 yes
-    User root
+	Hostname dir01.digitalpacific.com.au
+	ForwardX11 yes
+	User root
 
 # PUT NEW ONES BEFORE THIS ENTRY
 
 Host vps* vmcp* vmres* vmsrv* web* nxsrv* opstools vmse* *.digitalpacific.com.au *.smartservers.com.au *.auserver.com.au *.digitalpacific.com *.ha-node.net *.crucialx.net *.avs.com.au *.avs.net.au *.crucial.com.au *.aumanaged.com.au *.clusterdns.net *.aumanaged.com *.mailcluster.com.au *.hostopia.com.au *.panthur.com *.panthur.com.au *.web-servers.com.au *.stealth-servers.com.au *.yourdns.com.au
-        User root
+	User root
 
 Host *
-        User root
+	User root
