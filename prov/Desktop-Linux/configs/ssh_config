@@ -14,6 +14,10 @@ Host oob01.eqsy3.digitalpacific.com.au
 	Port 2274
 	User sshakir
 
+Host config02
+	Hostname config02.digitalpacific.com.au
+	User sshakir
+
 Host puppet02
 	Hostname puppet02.digitalpacific.com.au
 	User SShakir
