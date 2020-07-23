@@ -16,7 +16,7 @@ Host oob01.eqsy3.digitalpacific.com.au
 
 Host config02
 	Hostname config02.digitalpacific.com.au
-	User sshakir
+	User root
 
 Host puppet02
 	Hostname puppet02.digitalpacific.com.au
