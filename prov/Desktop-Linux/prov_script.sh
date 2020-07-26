@@ -253,7 +253,7 @@ EOF
 if [[ ${AUTO_GIT_PULL} =~ [Yy] ]]; then
     # Comment the below if the user is different
 	cat <<-EOF >> ${HOME_DIR}/.bashrc
-for i in ~/git/*; do git -C ${i} pull; done
+for i in ~/git/*; do git -C ${i} pull; done &
 EOF
 fi
 
