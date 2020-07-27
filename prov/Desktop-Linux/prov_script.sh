@@ -109,6 +109,7 @@ else
 alias ovpn='sudo openvpn --config ~/work/hostopia.ovpn &'
 alias sshdocker='ssh root@10.0.0.9'
 alias sshnas='ssh -p 7022 admin@10.0.0.3'
+alias sshpihole='ssh root@10.0.0.5'
 EOF
     # Downloading files from NAS
     mount -t cifs -o username=${NAS_USER},password=${NAS_PASS},vers=1.0 //10.0.0.3/Samis_Folder /mnt/NAS/Samis_folder/
