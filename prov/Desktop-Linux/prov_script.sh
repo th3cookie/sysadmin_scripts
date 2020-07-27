@@ -19,6 +19,7 @@ read -p 'Please set your computer hostname: ' PC_HOSTNAME
 hostnamectl set-hostname ${PC_HOSTNAME}
 read -p 'Git Config username: ' GIT_USERNAME
 read -p 'Git Config Email: ' GIT_EMAIL
+read -p 'Would you like to automatically git pull all branches on shell login? [Y/y] ' AUTO_GIT_PULL
 
 if [[ ! ${WORKPC} =~ [Yy] ]]; then
     # Comment the below if the user is different
@@ -249,6 +250,13 @@ ssh-add ~/.ssh/sami-openssh-private-key.ppk &> /dev/null
 ssh-add ~/.ssh/SShakir-openssh-private-key &> /dev/null
 
 EOF
+
+if [[ ${AUTO_GIT_PULL} =~ [Yy] ]]; then
+    # Comment the below if the user is different
+	cat <<-EOF >> ${HOME_DIR}/.bashrc
+for i in ~/git/*; do git -C ${i} pull; done &
+EOF
+fi
 
 # .bash_aliases
 cat << EOF >> ${HOME_DIR}/.bash_aliases
