@@ -79,6 +79,10 @@ Host fw01.ded.apdcsy1.as55803.net.au
 Host web03
 	Hostname web03.digitalpacific.com.au
 
+Host web02
+	Hostname web02.digitalpacific.com.au
+	IdentityFile ~/.ssh/id_rsa_work
+
 Host web.dp
 	Hostname web.digitalpacific.com.au
 
