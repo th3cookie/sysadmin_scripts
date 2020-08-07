@@ -8,15 +8,30 @@ Host *
 	KexAlgorithms +diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group14-sha1
 	Ciphers +aes192-ctr,aes256-ctr
 	MACs +hmac-sha2-256,hmac-sha2-512
+	StrictHostKeyChecking ask
 
 # Personal Configs
 
-Host 10.0.0.252
+Host tplinksw01-home
+	HostName 10.0.0.252
 	KexAlgorithms +diffie-hellman-group1-sha1
 	HostKeyAlgorithms +ssh-dss
 	Ciphers +aes256-cbc
 	User admin
 	IdentityFile ~/.ssh/id_rsa
+
+Host crucialvps
+	HostName 182.160.155.217
+	User root
+
+Host docker-home
+	HostName 10.0.0.9
+	User sami
+
+Host nas-home
+	HostName 10.0.0.3
+	User admin
+	Port 7022
 
 Host github
 	HostName github.com
