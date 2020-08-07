@@ -1,14 +1,4 @@
-# Personal Configs
-
-Host 10.0.0.252
-	KexAlgorithms +diffie-hellman-group1-sha1
-	HostKeyAlgorithms +ssh-dss
-	Ciphers +aes256-cbc
-	User admin
-	IdentityFile ~/.ssh/id_rsa
-
-Host github.com
-	Hostname github.com
+# Universal
 
 Host *
 	ForwardAgent yes
@@ -19,55 +9,67 @@ Host *
 	Ciphers +aes192-ctr,aes256-ctr
 	MACs +hmac-sha2-256,hmac-sha2-512
 
-# Work configs
+# Personal Configs
 
-Host oob01.eqsy3.digitalpacific.com.au
+Host 10.0.0.252
+	KexAlgorithms +diffie-hellman-group1-sha1
+	HostKeyAlgorithms +ssh-dss
+	Ciphers +aes256-cbc
+	User admin
+	IdentityFile ~/.ssh/id_rsa
+
+Host github
+	HostName github.com
+
+# Work Configs
+
+Host oob01
+	HostName oob01.eqsy3.digitalpacific.com.au
 	Port 2274
 	User sshakir
 
-Host config02
-	Hostname config02.digitalpacific.com.au
-	User root
-
 Host puppet02
-	Hostname puppet02.digitalpacific.com.au
+	HostName puppet02.digitalpacific.com.au
 	User SShakir
 
 Host puppet03
-	Hostname puppet03.digitalpacific.com.au
+	HostName puppet03.digitalpacific.com.au
 	User SShakir
 
 Host staff01
-	Hostname staff01.digitalpacific.com.au
+	HostName staff01.digitalpacific.com.au
 	User SShakir
 
 Host syslog01
-	Hostname syslog01.digitalpacific.com.au
+	HostName syslog01.digitalpacific.com.au
 	User SShakir
 
 Host rr01
-	Hostname rapidrestore-workspace.int.digitalpacific.com.au
+	HostName rapidrestore-workspace.int.digitalpacific.com.au
 
 Host rr02
-	Hostname rapidrestore-workspace02.int.digitalpacific.com.au
+	HostName rapidrestore-workspace02.int.digitalpacific.com.au
 
 Host rr03
-	Hostname rapidrestore-workspace03.int.digitalpacific.com.au
+	HostName rapidrestore-workspace03.int.digitalpacific.com.au
 
 Host rr04
-	Hostname rapidrestore-workspace04.int.digitalpacific.com.au
+	HostName rapidrestore-workspace04.int.digitalpacific.com.au
 
 Host rr05
-	Hostname rapidrestore-workspace05.int.digitalpacific.com.au
+	HostName rapidrestore-workspace05.int.digitalpacific.com.au
+
+Host rr06
+	HostName rapidrestore-workspace06.int.digitalpacific.com.au
 
 Host ded*
-	user root
+	User root
 	CanonicalizeHostname always
 	CanonicalDomains smartservers.com.au digitalpacific.com.au
 	CanonicalizeFallbackLocal yes
 
 Host cpdev
-	Hostname cpanel-dev.ha-node.net
+	HostName cpanel-dev.ha-node.net
 	User root
 
 Host dsw*
@@ -77,17 +79,20 @@ Host fw01.ded.apdcsy1.as55803.net.au
 	User sshakir
 
 Host web03
-	Hostname web03.digitalpacific.com.au
+	HostName web03.digitalpacific.com.au
+	IdentityFile ~/.ssh/id_rsa_work
+	User root
 
 Host web02
-	Hostname web02.digitalpacific.com.au
+	HostName web02.digitalpacific.com.au
 	IdentityFile ~/.ssh/id_rsa_work
+	User root
 
 Host web.dp
-	Hostname web.digitalpacific.com.au
+	HostName web.digitalpacific.com.au
 
 Host dir01
-	Hostname dir01.digitalpacific.com.au
+	HostName dir01.digitalpacific.com.au
 	ForwardX11 yes
 	User root
 
