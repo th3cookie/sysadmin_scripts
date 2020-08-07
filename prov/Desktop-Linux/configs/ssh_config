@@ -1,6 +1,9 @@
 # Personal Configs
 
-Host tplinksw01-home
+Host pfsense
+	HostName pfsense.samishakir.com
+
+Host tplink
 	HostName tplink-sw01.samishakir.com
 	KexAlgorithms +diffie-hellman-group1-sha1
 	HostKeyAlgorithms +ssh-dss
@@ -11,16 +14,16 @@ Host tplinksw01-home
 Host crucialvps
 	HostName crucial.samishakir.com
 
-Host docker-home
+Host docker
 	HostName docker.samishakir.com
 	User sami
 
-Host nas-home
+Host nas
 	HostName nas.samishakir.com
 	User admin
 	Port 7022
 
-Host pihole-home
+Host pihole
 	HostName pihole.samishakir.com
 
 Host github
