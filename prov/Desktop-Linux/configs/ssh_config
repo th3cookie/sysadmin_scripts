@@ -1,7 +1,7 @@
 # Personal Configs
 
 Host tplinksw01-home
-	HostName 10.0.0.252
+	HostName tplink-sw01.samishakir.com
 	KexAlgorithms +diffie-hellman-group1-sha1
 	HostKeyAlgorithms +ssh-dss
 	Ciphers +aes256-cbc
@@ -9,19 +9,19 @@ Host tplinksw01-home
 	IdentityFile ~/.ssh/id_rsa
 
 Host crucialvps
-	HostName 182.160.155.217
+	HostName crucial.samishakir.com
 
 Host docker-home
-	HostName 10.0.0.9
+	HostName docker.samishakir.com
 	User sami
 
 Host nas-home
-	HostName 10.0.0.3
+	HostName nas.samishakir.com
 	User admin
 	Port 7022
 
 Host pihole-home
-	HostName 10.0.0.5
+	HostName pihole.samishakir.com
 
 Host github
 	HostName github.com
