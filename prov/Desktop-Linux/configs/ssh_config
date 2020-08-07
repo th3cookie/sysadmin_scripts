@@ -1,15 +1,3 @@
-# Universal
-
-Host *
-	ForwardAgent yes
-	KeepAlive yes
-	ServerAliveInterval 60
-	AddressFamily inet
-	KexAlgorithms +diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group14-sha1
-	Ciphers +aes192-ctr,aes256-ctr
-	MACs +hmac-sha2-256,hmac-sha2-512
-	StrictHostKeyChecking ask
-
 # Personal Configs
 
 Host tplinksw01-home
@@ -117,4 +105,12 @@ Host vps* vmcp* vmres* vmsrv* web* nxsrv* opstools vmse* *.digitalpacific.com.au
 	User root
 
 Host *
+	ForwardAgent yes
+	KeepAlive yes
+	ServerAliveInterval 60
+	AddressFamily inet
+	KexAlgorithms +diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group14-sha1
+	Ciphers +aes192-ctr,aes256-ctr
+	MACs +hmac-sha2-256,hmac-sha2-512
+	StrictHostKeyChecking ask
 	User root
