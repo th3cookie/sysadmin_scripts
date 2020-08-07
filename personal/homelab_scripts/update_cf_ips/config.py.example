@@ -1,0 +1,5 @@
+# Get this from cloudflare using your big_brain
+# api key may not be required...
+api_key = "XXXXXXXXXXXXXXXXXXXXXXXXX"
+auth_key = "XXXXXXXXXXXXXXXXXXXXXXXXX"
+auth_email = "example@example.com"
