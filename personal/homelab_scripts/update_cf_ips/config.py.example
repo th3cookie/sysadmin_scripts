@@ -3,3 +3,4 @@
 api_key = "XXXXXXXXXXXXXXXXXXXXXXXXX"
 auth_key = "XXXXXXXXXXXXXXXXXXXXXXXXX"
 auth_email = "example@example.com"
+domain = "example.com"
