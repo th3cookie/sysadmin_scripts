@@ -4,3 +4,5 @@ api_key = "XXXXXXXXXXXXXXXXXXXXXXXXX"
 auth_key = "XXXXXXXXXXXXXXXXXXXXXXXXX"
 auth_email = "example@example.com"
 domain = "example.com"
+# subdomain A record to update with current WAN IP
+record = "home"
