@@ -12,6 +12,7 @@ Copy the file 'config.py.example' to config.py:
 
 ```cd personal/homelab_scripts/update_cf_ips
 cp config.py.example config.py
+chmod +x update_cf_ip.py
 ```
 
 Fill in the relevant details in the config.py file
@@ -26,3 +27,8 @@ If you want to enable debugging for verbose printing to stdout:
 
 # Setting up as a daily cron
 
+```crontab -e```
+
+Add the full path to the script (example below):
+
+```5 4 * * */home/sami/git/sysadmin_scripts/personal/homelab_scripts/update_cf_ips/update_cf_ip.py```
