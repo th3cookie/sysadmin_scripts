@@ -6,9 +6,13 @@
 
 # Setup
 
+Clone the repo locally.
+
 Copy the file 'config.py.example' to config.py:
 
-```cp config.py.example config.py```
+```cd personal/homelab_scripts/update_cf_ips
+cp config.py.example config.py
+```
 
 Fill in the relevant details in the config.py file
 
@@ -19,3 +23,6 @@ Fill in the relevant details in the config.py file
 If you want to enable debugging for verbose printing to stdout:
 
 ```python3.8 ./update_cf_ip.py --debug```
+
+# Setting up as a daily cron
+
