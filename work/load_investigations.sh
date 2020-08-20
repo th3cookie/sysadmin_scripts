@@ -15,4 +15,5 @@ grep ${SEARCH} /home/$USER/access-logs/* 2> /dev/null | grep -oP "(?=(GET|POST)\
 mysql -e "select DB from INFORMATION_SCHEMA.PROCESSLIST;" | awk /^DB$\|^information_schema$/'{ next; } {print $1}' | sort | uniq -c | sort -n
 
 # Then if you want to tail the logs of the largest amount of mysql connections:
-tail -f /home/$(mysql -e "select DB from INFORMATION_SCHEMA.PROCESSLIST;" | awk /^DB$\|^information_schema$/'{ next; } {print $1}' | sort | uniq -c | sort -n | tail -n 1 | awk '{print $2}' | awk -F '_' '{print $1}')*/access-logs/*
+TOP_USER=$(mysql -e "select DB from INFORMATION_SCHEMA.PROCESSLIST;" | awk /^DB$\|^information_schema$/'{ next; } {print $1}' | sort | uniq -c | sort -n | tail -n 1 | awk '{print $2}' | awk -F '_' '{print $1}')
+echo "Top user: ${TOP_USER}"; tail -f /home/${TOP_USER}*/access-logs/*
